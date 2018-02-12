@@ -57,21 +57,15 @@ io.on('connection', function (client) {
             buffer.writeInt8(1);
             port.write(buffer);
         }
-        /**Blood Presure Measurement
-         * Taking 201 as input from frontend 
+        /**
+         * GSR Measurement
+         * Taking gsr as input from frontend in String format
+         * 
+         * Send 2 from node.js to arduino for communication
          */
-        else if (status == "201") {
+        else if (status == "gsr") {
             var buffer = new Buffer(1);
-            buffer.writeInt8(101);
-            port.write(buffer);
-        }
-
-        /**EMG Measurement
-         * Taking 202 as input from frontend 
-         */
-        else if (status == "202") {
-            var buffer = new Buffer(1);
-            buffer.writeInt8(102);
+            buffer.writeInt8(2);
             port.write(buffer);
         }
     });
