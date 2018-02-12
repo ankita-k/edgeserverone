@@ -15,6 +15,17 @@ const userSchema = mongoose.Schema({
     },
     temperature: {
         type: String
+    },
+    gsr: {
+        conductance: {
+            type: String
+        },
+        resistance: {
+            type: String
+        },
+        conductanceVol: {
+            type: String
+        }
     }
 });
 

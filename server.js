@@ -156,7 +156,10 @@ app.put('/sensorValues', function (request, response) {
 
     let details = {};
     let time = request.body.time;
+    //For measuring temperature
     let temperature = request.body.temperature;
+    //For measuring GSR
+    let gsr = request.body.gsr;
 
     User.findOne({ id: request.body.id }, function (error, res) {
         if (error) {
@@ -168,11 +171,15 @@ app.put('/sensorValues', function (request, response) {
 
             if (time == res.loginTime) {
                 switch (request.body) {
-                    case request.body.temperature: {
+                    case request.body.temperature:
                         console.log("Temperature value :", request.body.temperature);
                         res.temperature = temperature;
                         break;
-                    }
+                    case request.body.gsr:
+                        console.log("GSR value :", request.body.gsr);
+                    // res.gsr.conductance = conductance;
+                    // res.gsr.resistance = resistance;
+                    // res.gsr.conductanceVol = conductanceVol;
                 }
                 res.save((error, result) => {
                     if (error) {
