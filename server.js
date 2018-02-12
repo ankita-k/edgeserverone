@@ -146,6 +146,7 @@ app.post('/registrationAndLogin', function (request, response) {
 /**
  * 
  * Save sensor values
+ * time:String
  * id:String
  * temperature:String
  */
@@ -154,6 +155,7 @@ app.put('/sensorValues', function (request, response) {
     console.log(request.body);
 
     let details = {};
+    let time = request.body.time;
     let temperature = request.body.temperature;
 
     User.findOne({ id: request.body.id }, function (error, res) {
@@ -162,28 +164,34 @@ app.put('/sensorValues', function (request, response) {
             details.message = `User not found.`;
             response.status(404).json(details);
         } else if (res) {
-            console.log("Result value :", res);
+            console.log("Res value :", res);
 
-            switch (request.body) {
-                case request.body.temperature: {
-                    console.log("Temperature value :", request.body.temperature);
-                    res.temperature = temperature;
-                    break;
+            if (time == res.loginTime) {
+                switch (request.body) {
+                    case request.body.temperature: {
+                        console.log("Temperature value :", request.body.temperature);
+                        res.temperature = temperature;
+                        break;
+                    }
                 }
+                res.save((error, result) => {
+                    if (error) {
+                        details.error = true;
+                        details.message = `Sensor value not updated.`;
+                        response.status(404).json(details);
+                    } else if (result) {
+                        console.log("Sensor value result :", result);
+                        details.error = false;
+                        details.SensorDetails = result;
+                        details.message = `Sensor Details.`;
+                        response.status(200).json(details);
+                    }
+                });
+            } else {
+                details.error = false;
+                details.message = `Login time and sensor update time is not matched.`;
+                response.status(200).json(details);
             }
-            res.save((error, result) => {
-                if (error) {
-                    details.error = true;
-                    details.message = `Sensor value not updated.`;
-                    response.status(404).json(details);
-                } else if (result) {
-                    console.log("Sensor value result :", result);
-                    details.error = false;
-                    details.SensorDetails = result;
-                    details.message = `Sensor Details.`;
-                    response.status(200).json(details);
-                }
-            });
         }
 
     });
