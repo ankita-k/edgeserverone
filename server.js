@@ -21,8 +21,8 @@ let vitalStats = require('./models/vitalStats');
 /**
  * connect to mongodb
 */
-mongoose.connect('mongodb://127.0.0.1:27017/edge');
-// mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
+// mongoose.connect('mongodb://127.0.0.1:27017/edge');
+mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -66,6 +66,17 @@ io.on('connection', function (client) {
         else if (status == "gsr") {
             var buffer = new Buffer(1);
             buffer.writeInt8(2);
+            port.write(buffer);
+        }
+        /**
+         * Glucometer Measurement
+         * Taking glucometer as input from frontend in String format
+         * 
+         * Send 3 from node.js to arduino for communication
+         */
+        else if (status == "glucometer") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(3);
             port.write(buffer);
         }
     });
@@ -141,6 +152,9 @@ app.put('/sensorValues', function (request, response) {
     /**For measuring GSR*/
     let gsr = request.body.gsr;
 
+    /**For measuring glucometer */
+    let glucometer = request.body.glucometer;
+
     vitalStats.findOne({ _id: request.body._id }, function (error, res) {
         if (error) {
             details.error = true;
@@ -155,6 +169,11 @@ app.put('/sensorValues', function (request, response) {
             if (gsr) {
                 res.stats.push({
                     "gsr": gsr
+                });
+            }
+            if (glucometer) {
+                res.stats.push({
+                    "glucometer": glucometer
                 });
             }
             res.save(function (error, result) {
