@@ -14,15 +14,15 @@ var io = require('socket.io')(server);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
- * Import User model
+ * Import vitalStats model
 */
-let User = require('./models/user');
+let vitalStats = require('./models/vitalStats');
 
 /**
  * connect to mongodb
 */
-// mongoose.connect('mongodb://127.0.0.1:27017/Edge');
-mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
+mongoose.connect('mongodb://127.0.0.1:27017/edge');
+// mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -93,46 +93,28 @@ io.on('connection', function (client) {
  * loginTime:String
  * 
  */
-app.post('/registrationAndLogin', function (request, response) {
+app.post('/registration', function (request, response) {
     console.log("User data :");
     console.log(request.body);
 
     let userDetails = {};
 
-    User.find({ id: request.body.id }, function (error, res) {
+    let data = new vitalStats();
+    data.name = request.body.name;
+    data.email = request.body.email;
+    data.individualId = request.body.individualId;
+
+    data.save(function (error, result) {
         if (error) {
             userDetails.error = true;
-            userDetails.message = `User not found.`;
+            userDetails.message = `User details not saved.`;
             response.status(404).json(userDetails);
-        } else if (res) {
-            if (res.length == 0) {
-
-                let data = new User();
-                data.name = request.body.name;
-                data.email = request.body.email;
-                data.id = request.body.id;
-                data.loginTime = request.body.loginTime;
-
-                data.save(function (error, result) {
-                    if (error) {
-                        userDetails.error = true;
-                        userDetails.message = `User details not saved.`;
-                        response.status(404).json(userDetails);
-                    } else if (result) {
-                        console.log("User registration result :", result);
-                        userDetails.error = false;
-                        userDetails.userRegistration = result;
-                        userDetails.message = `User Registration Details.`;
-                        response.status(200).json(userDetails);
-                    }
-                });
-            } else {
-                console.log("User login result :", result);
-                userDetails.error = false;
-                userDetails.userLogin = res;
-                userDetails.message = `User Login Details.`;
-                response.status(200).json(userDetails);
-            }
+        } else if (result) {
+            console.log("User registration result :", result);
+            userDetails.error = false;
+            userDetails.userRegistration = result;
+            userDetails.message = `User Registration Details.`;
+            response.status(200).json(userDetails);
         }
     });
 });
@@ -141,60 +123,53 @@ app.post('/registrationAndLogin', function (request, response) {
  * 
  * Save sensor values
  * time:String
- * id:String
  * temperature:String
+ * "gsr":{
+ *  "conductance":"",
+ *  "resistance":"",
+ *  "conductanceVol":""
+ * }
  */
 app.put('/sensorValues', function (request, response) {
     console.log("request.body :");
     console.log(request.body);
 
     let details = {};
-    let time = request.body.time;
-    //For measuring temperature
+    /**For measuring temperature*/
     let temperature = request.body.temperature;
-    //For measuring GSR
+
+    /**For measuring GSR*/
     let gsr = request.body.gsr;
 
-    User.findOne({ id: request.body.id }, function (error, res) {
+    vitalStats.findOne({ _id: request.body._id }, function (error, res) {
         if (error) {
             details.error = true;
             details.message = `User not found.`;
             response.status(404).json(details);
         } else if (res) {
-            console.log("Res value :", res);
-
-            if (time == res.loginTime) {
-                switch (request.body) {
-                    case request.body.temperature:
-                        console.log("Temperature value :", request.body.temperature);
-                        res.temperature = temperature;
-                        break;
-                    case request.body.gsr:
-                        console.log("GSR value :", request.body.gsr);
-                    // res.gsr.conductance = conductance;
-                    // res.gsr.resistance = resistance;
-                    // res.gsr.conductanceVol = conductanceVol;
-                }
-                res.save((error, result) => {
-                    if (error) {
-                        details.error = true;
-                        details.message = `Sensor value not updated.`;
-                        response.status(404).json(details);
-                    } else if (result) {
-                        console.log("Sensor value result :", result);
-                        details.error = false;
-                        details.SensorDetails = result;
-                        details.message = `Sensor Details.`;
-                        response.status(200).json(details);
-                    }
+            if (temperature) {
+                res.stats.push({
+                    "temperature": temperature
                 });
-            } else {
-                details.error = false;
-                details.message = `Login time and sensor update time is not matched.`;
-                response.status(200).json(details);
             }
+            if (gsr) {
+                res.stats.push({
+                    "gsr": gsr
+                });
+            }
+            res.save(function (error, result) {
+                if (error) {
+                    details.error = true;
+                    details.message = `Sensor details not saved.`;
+                    response.status(404).json(details);
+                } else if (result) {
+                    details.error = false;
+                    details.sensorDetails = result;
+                    details.message = `Sensor Details.`;
+                    response.status(200).json(details);
+                }
+            });
         }
-
     });
 });
 
