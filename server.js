@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 const Readline = SerialPort.parsers.Readline;
+
 const port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
@@ -49,7 +50,7 @@ io.on('connection', function (client) {
         /**
          * Body Temparature Measurement
          * Taking temperature as input from frontend in String format
-         * 
+         *
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
@@ -60,10 +61,10 @@ io.on('connection', function (client) {
         /**
          * GSR Measurement
          * Taking gsr as input from frontend in String format
-         * 
+         *
          * Send 2 from node.js to arduino for communication
          */
-        else if (status == "gsr") {
+        if (status == "gsr") {
             var buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer);
@@ -71,12 +72,56 @@ io.on('connection', function (client) {
         /**
          * Glucometer Measurement
          * Taking glucometer as input from frontend in String format
-         * 
+         *
          * Send 3 from node.js to arduino for communication
          */
-        else if (status == "glucometer") {
+        if (status == "glucometer") {
             var buffer = new Buffer(1);
             buffer.writeInt8(3);
+            port.write(buffer);
+        }
+        /**
+         * Body Position Measurement
+         * Taking bodyposition as input from frontend in String format
+         *
+         * Send 4 from node.js to arduino for communication
+         */
+        if (status == "bodyposition") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(4);
+            port.write(buffer);
+        }
+        /**
+         * Blood Presure Measurement
+         * Taking bp as input from frontend in String format
+         *
+         * Send 5 from node.js to arduino for communication
+         */
+        if (status == "bp") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(5);
+            port.write(buffer);
+        }
+        /**
+         * ECG Measurement
+         * Taking ecg as input from frontend in String format
+         *
+         * Send 6 from node.js to arduino for communication
+         */
+        if (status == "ecg") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(6);
+            port.write(buffer);
+        }
+        /**
+         * EMG Measurement
+         * Taking emg as input from frontend in String format
+         *
+         * Send 7 from node.js to arduino for communication
+         */
+        if (status == "emg") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(7);
             port.write(buffer);
         }
     });
@@ -92,12 +137,12 @@ io.on('connection', function (client) {
 });
 
 /**
- * Routings 
+ * Routings
  */
 
 /**
  * User registration and login
- * 
+ *
  * id:String
  * name:String
  * email:String
@@ -131,7 +176,7 @@ app.post('/registration', function (request, response) {
 });
 
 /**
- * 
+ *
  * Save sensor values
  * time:String
  * temperature:String
@@ -155,6 +200,16 @@ app.put('/sensorValues', function (request, response) {
     /**For measuring glucometer */
     let glucometer = request.body.glucometer;
 
+    /**For measuring body position */
+    let bodyposition = request.body.bodyposition;
+
+    /**For measuring ECG */
+    let ecg = request.body.ecg;
+
+    /**For measuring EMG */
+    let emg = request.body.emg;
+
+
     vitalStats.findOne({ _id: request.body._id }, function (error, res) {
         if (error) {
             details.error = true;
@@ -174,6 +229,21 @@ app.put('/sensorValues', function (request, response) {
             if (glucometer) {
                 res.stats.push({
                     "glucometer": glucometer
+                });
+            }
+            if (bodyposition) {
+                res.stats.push({
+                    "bodyposition": bodyposition
+                });
+            }
+            if (ecg) {
+                res.stats.push({
+                    "ecg": ecg
+                });
+            }
+            if (emg) {
+                res.stats.push({
+                    "emg": emg
                 });
             }
             res.save(function (error, result) {
