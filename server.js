@@ -5,8 +5,9 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 const Readline = SerialPort.parsers.Readline;
 
+let baudRate;
 const port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200
+    baudRate: _base.baudRate
 });
 
 var app = express();
@@ -45,6 +46,7 @@ app.use(bodyParser.json());
 io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
+    let _base = this;
     client.on("start", function (data) {
         status = data.status;
         /**
@@ -54,6 +56,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
+            _base.baudRate = 115200;
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer);
@@ -98,6 +101,7 @@ io.on('connection', function (client) {
          * Send 5 from node.js to arduino for communication
          */
         if (status == "bp") {
+            _base.baudRate = 19200;
             var buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer);
