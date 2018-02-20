@@ -134,7 +134,8 @@ io.on('connection', function (client) {
      * Getting values from arduino
     */
     parser.on('data', function (data) {
-        console.log("Data from arduino :", data);
+        console.log("baud rate :", _base.baudRate);
+        console.log("arduino data :", data);
         client.emit('value',
             { "value": data, "status": status });
     });
