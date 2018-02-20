@@ -108,6 +108,7 @@ io.on('connection', function (client) {
             _base.baudRate = 19200;
             console.log("bp" + ' ' + _base.baudRate);
             bpStartFunc = setInterval(function () {
+                console.log(5);
                 var buffer = new Buffer(1);
                 buffer.writeInt8(5);
                 port.write(buffer);
