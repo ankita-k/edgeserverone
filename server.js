@@ -48,6 +48,7 @@ io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
     let _base = this;
+    let bpStartFunc;
     client.on("start", function (data) {
         status = data.status;
         console.log("status :", status);
@@ -106,9 +107,11 @@ io.on('connection', function (client) {
         if (status == "bp") {
             _base.baudRate = 19200;
             console.log("bp" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
-            buffer.writeInt8(5);
-            port.write(buffer);
+            bpStartFunc = setInterval(function () {
+                var buffer = new Buffer(1);
+                buffer.writeInt8(5);
+                port.write(buffer);
+            }, 250)
         }
         /**
          * ECG Measurement
@@ -138,6 +141,9 @@ io.on('connection', function (client) {
      * Getting values from arduino
     */
     parser.on('data', function (data) {
+        if (data) {
+            clearInterval(bpStartFunc);
+        }
         console.log("baud rate :", _base.baudRate);
         console.log("arduino data :", data);
         client.emit('value',
