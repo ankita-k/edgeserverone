@@ -214,6 +214,9 @@ app.put('/sensorValues', function (request, response) {
     /**For measuring EMG */
     let emg = request.body.emg;
 
+    /**For measuring EMG */
+    let bp = request.body.bp;
+
 
     vitalStats.findOne({ _id: request.body._id }, function (error, res) {
         if (error) {
@@ -249,6 +252,11 @@ app.put('/sensorValues', function (request, response) {
             if (emg) {
                 res.stats.push({
                     "emg": emg
+                });
+            }
+            if (bp) {
+                res.stats.push({
+                    "bp": bp
                 });
             }
             res.save(function (error, result) {
