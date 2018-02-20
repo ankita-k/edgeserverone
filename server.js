@@ -6,8 +6,9 @@ var bodyParser = require('body-parser');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
+let _base = this;
 const port = new SerialPort('/dev/ttyACM0', {
-    baudRate: _base.baudRate
+    baudRate: parseInt(_base.baudRate)
 });
 
 var app = express();
@@ -57,6 +58,7 @@ io.on('connection', function (client) {
          */
         if (status == "temperature") {
             _base.baudRate = 115200;
+            console.log(typeof (_base.baudRate));
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer);
