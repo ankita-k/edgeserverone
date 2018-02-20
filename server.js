@@ -50,6 +50,7 @@ io.on('connection', function (client) {
     let _base = this;
     client.on("start", function (data) {
         status = data.status;
+        console.log("status :", status);
         /**
          * Body Temparature Measurement
          * Taking temperature as input from frontend in String format
@@ -58,7 +59,7 @@ io.on('connection', function (client) {
          */
         if (status == "temperature") {
             _base.baudRate = 115200;
-            console.log(typeof (_base.baudRate));
+            console.log("temperature" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer);
@@ -104,6 +105,7 @@ io.on('connection', function (client) {
          */
         if (status == "bp") {
             _base.baudRate = 19200;
+            console.log("bp" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer);
