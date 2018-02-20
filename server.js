@@ -112,7 +112,7 @@ io.on('connection', function (client) {
                 var buffer = new Buffer(1);
                 buffer.writeInt8(5);
                 port.write(buffer);
-            }, 250)
+            }, 1000)
         }
         /**
          * ECG Measurement
