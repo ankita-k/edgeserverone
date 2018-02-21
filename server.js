@@ -5,22 +5,10 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 const Readline = SerialPort.parsers.Readline;
 
-let baudRate;
-let _base = this;
-const port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200
-});
-
-
-// const port = new SerialPort('/dev/ttyACM0', {
-//     baudRate: parseInt(_base.baudRate)
-// });
-
-
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
@@ -64,11 +52,29 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
-            // _base.baudRate = 115200;
-            // console.log("temperature" + ' ' + _base.baudRate);
+            const port = new SerialPort('/dev/ttyACM0', {
+                baudRate: 115200
+            });
+
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("port error :", error);
+                } else {
+                    console.log("buffer :", buffer.toString('hex'));
+                }
+            });
+
+            /**
+            * Getting values from arduino
+            */
+            port.on('data', function (data) {
+                // console.log("baud rate :", _base.baudRate);
+                console.log("arduino data :", data.toString());
+                client.emit('value',
+                    { "value": data.toString(), "status": status });
+            });
         }
         /**
          * GSR Measurement
@@ -77,11 +83,29 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
-            // _base.baudRate = 115200;
-            // console.log("gsr" + ' ' + _base.baudRate);
+            const port = new SerialPort('/dev/ttyACM0', {
+                baudRate: 115200
+            });
+
             var buffer = new Buffer(1);
-            buffer.writeInt8(2);
-            port.write(buffer);
+            buffer.writeInt8(1);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("port error :", error);
+                } else {
+                    console.log("buffer :", buffer.toString('hex'));
+                }
+            });
+
+            /**
+            * Getting values from arduino
+            */
+            port.on('data', function (data) {
+                // console.log("baud rate :", _base.baudRate);
+                console.log("arduino data :", data.toString());
+                client.emit('value',
+                    { "value": data.toString(), "status": status });
+            });
         }
         /**
          * Glucometer Measurement
@@ -144,16 +168,6 @@ io.on('connection', function (client) {
             buffer.writeInt8(7);
             port.write(buffer);
         }
-    });
-
-    /**
-     * Getting values from arduino
-    */
-    parser.on('data', function (data) {
-        // console.log("baud rate :", _base.baudRate);
-        console.log("arduino data :", data);
-        client.emit('value',
-            { "value": data, "status": status });
     });
 });
 
