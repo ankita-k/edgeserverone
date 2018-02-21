@@ -72,6 +72,8 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
+            _base.baudRate = 115200;
+            console.log("gsr" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer);
@@ -83,6 +85,8 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "glucometer") {
+            _base.baudRate = 115200;
+            console.log("glucometer" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(3);
             port.write(buffer);
@@ -107,12 +111,9 @@ io.on('connection', function (client) {
         if (status == "bp") {
             _base.baudRate = 19200;
             console.log("bp" + ' ' + _base.baudRate);
-            bpStartFunc = setInterval(function () {
-                console.log(5);
-                var buffer = new Buffer(1);
-                buffer.writeInt8(5);
-                port.write(buffer);
-            }, 1000)
+            var buffer = new Buffer(1);
+            buffer.writeInt8(5);
+            port.write(buffer);
         }
         /**
          * ECG Measurement
@@ -121,6 +122,8 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
+            _base.baudRate = 115200;
+            console.log("ecg" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(6);
             port.write(buffer);
@@ -142,9 +145,6 @@ io.on('connection', function (client) {
      * Getting values from arduino
     */
     parser.on('data', function (data) {
-        if (data) {
-            clearInterval(bpStartFunc);
-        }
         console.log("baud rate :", _base.baudRate);
         console.log("arduino data :", data);
         client.emit('value',
