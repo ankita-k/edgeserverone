@@ -8,8 +8,14 @@ const Readline = SerialPort.parsers.Readline;
 let baudRate;
 let _base = this;
 const port = new SerialPort('/dev/ttyACM0', {
-    baudRate: parseInt(_base.baudRate)
+    baudRate: 115200
 });
+
+
+// const port = new SerialPort('/dev/ttyACM0', {
+//     baudRate: parseInt(_base.baudRate)
+// });
+
 
 var app = express();
 var server = require('http').Server(app);
@@ -48,7 +54,6 @@ io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
     let _base = this;
-    let bpStartFunc;
     client.on("start", function (data) {
         status = data.status;
         console.log("status :", status);
@@ -59,8 +64,8 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
-            _base.baudRate = 115200;
-            console.log("temperature" + ' ' + _base.baudRate);
+            // _base.baudRate = 115200;
+            // console.log("temperature" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer);
@@ -72,8 +77,8 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
-            _base.baudRate = 115200;
-            console.log("gsr" + ' ' + _base.baudRate);
+            // _base.baudRate = 115200;
+            // console.log("gsr" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer);
@@ -85,8 +90,8 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "glucometer") {
-            _base.baudRate = 115200;
-            console.log("glucometer" + ' ' + _base.baudRate);
+            // _base.baudRate = 115200;
+            // console.log("glucometer" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(3);
             port.write(buffer);
@@ -109,8 +114,8 @@ io.on('connection', function (client) {
          * Send 5 from node.js to arduino for communication
          */
         if (status == "bp") {
-            _base.baudRate = 19200;
-            console.log("bp" + ' ' + _base.baudRate);
+            // _base.baudRate = 19200;
+            // console.log("bp" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer);
@@ -122,8 +127,8 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
-            _base.baudRate = 115200;
-            console.log("ecg" + ' ' + _base.baudRate);
+            // _base.baudRate = 115200;
+            // console.log("ecg" + ' ' + _base.baudRate);
             var buffer = new Buffer(1);
             buffer.writeInt8(6);
             port.write(buffer);
@@ -145,7 +150,7 @@ io.on('connection', function (client) {
      * Getting values from arduino
     */
     parser.on('data', function (data) {
-        console.log("baud rate :", _base.baudRate);
+        // console.log("baud rate :", _base.baudRate);
         console.log("arduino data :", data);
         client.emit('value',
             { "value": data, "status": status });
