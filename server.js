@@ -11,6 +11,9 @@ var io = require('socket.io')(server);
 // const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 let arduinoPort = '/dev/ttyACM0';
+const port = new SerialPort(arduinoPort, {
+    baudRate: 115200
+});
 
 /**
  * Import vitalStats model
@@ -43,7 +46,6 @@ app.use(bodyParser.json());
 io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
-    let _base = this;
     client.on("start", function (data) {
         status = data.status;
         console.log("status :", status);
@@ -54,9 +56,6 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
-            const port = new SerialPort(arduinoPort, {
-                baudRate: 115200
-            });
 
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
@@ -66,16 +65,6 @@ io.on('connection', function (client) {
                 } else {
                     console.log("buffer :", buffer.toString('hex'));
                 }
-            });
-
-            /**
-            * Getting values from arduino
-            */
-            port.on('data', function (data) {
-                console.log("ok");
-                console.log("arduino data :", data.toString());
-                client.emit('value',
-                    { "value": data.toString(), "status": status });
             });
         }
         /**
@@ -85,10 +74,6 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
-            const port = new SerialPort(arduinoPort, {
-                baudRate: 115200
-            });
-
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -97,16 +82,6 @@ io.on('connection', function (client) {
                 } else {
                     console.log("buffer :", buffer.toString('hex'));
                 }
-            });
-
-            /**
-            * Getting values from arduino
-            */
-            port.on('data', function (data) {
-                // console.log("baud rate :", _base.baudRate);
-                console.log("arduino data :", data.toString());
-                client.emit('value',
-                    { "value": data.toString(), "status": status });
             });
         }
         /**
@@ -170,6 +145,16 @@ io.on('connection', function (client) {
             buffer.writeInt8(7);
             port.write(buffer);
         }
+    });
+
+    /**
+    * Getting values from arduino
+    */
+    port.on('data', function (data) {
+        console.log("ok");
+        console.log("arduino data :", data.toString());
+        client.emit('value',
+            { "value": data.toString(), "status": status });
     });
 });
 
