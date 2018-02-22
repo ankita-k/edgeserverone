@@ -8,8 +8,7 @@ const vitalStatsSchema = mongoose.Schema({
         type: String
     },
     loginTime: {
-        type: Date,
-        default: Date.now
+        type: String
     },
     individualId: {
         type: String

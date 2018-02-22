@@ -3,6 +3,7 @@ const SerialPort = require('serialport');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
+var https = require('https');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
@@ -162,7 +163,7 @@ io.on('connection', function (client) {
          * Send 9 from node.js to arduino for communication
          */
         if (status == "snore") {
-            var buffer = new Buffer(1); 
+            var buffer = new Buffer(1);
             buffer.writeInt8(9);
             port.write(buffer);
         }
@@ -197,11 +198,43 @@ app.post('/registration', function (request, response) {
     console.log(request.body);
 
     let userDetails = {};
+    let name = request.body.name;
+    let email = request.body.email;
+    let individualId = request.body.individualId;
+    let loginTime = request.body.loginTime;
+
+    /**calling rest api for meme server
+     * post operation
+    */
+
+    //creating JSON object
+    JSONObject = JSON.stringify({
+        "name": name,
+        "email": email,
+        "loginTime": loginTime,
+        "individualId": individualId,
+        "createdBy": individualId,
+        "updatedBy": individualId
+    });
+
+    //header
+    let postheaders = {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(JSONObject, 'utf8')
+    };
+    //option
+    let optionspost = {
+        host: 'http://mitapi.memeinfotech.com',
+        port: 5020,
+        path: '/vital/create',
+        method: 'POST',
+        headers: postheaders
+    };
 
     let data = new vitalStats();
-    data.name = request.body.name;
-    data.email = request.body.email;
-    data.individualId = request.body.individualId;
+    data.name = name;
+    data.email = email;
+    data.individualId = individualId;
 
     data.save(function (error, result) {
         if (error) {
@@ -214,6 +247,23 @@ app.post('/registration', function (request, response) {
             userDetails.userRegistration = result;
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
+
+
+            //post temperature data to meme server
+            let request = https.request(optionspost, (response) => {
+                console.log('statusCode:', response.statusCode);
+
+                response.on('data', (d) => {
+                    process.stdout.write(d);
+                });
+            });
+
+            request.on('error', (error) => {
+                console.error("error in https :", error);
+            });
+
+            request.write(JSONObject);
+            request.end();
         }
     });
 });
@@ -234,6 +284,7 @@ app.put('/sensorValues', function (request, response) {
     console.log(request.body);
 
     let details = {};
+
     /**For measuring temperature*/
     let temperature = request.body.temperature;
 
@@ -262,11 +313,17 @@ app.put('/sensorValues', function (request, response) {
             details.message = `User not found.`;
             response.status(404).json(details);
         } else if (res) {
+            /**temperature
+             * post data to local database
+             * post data to meme server
+             */
             if (temperature) {
+                //post temperature data to local database
                 res.stats.push({
                     "temperature": temperature
                 });
             }
+
             if (gsr) {
                 res.stats.push({
                     "gsr": gsr
