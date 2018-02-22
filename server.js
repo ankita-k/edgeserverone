@@ -3,7 +3,7 @@ const SerialPort = require('serialport');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
-var https = require('https');
+var http = require('http');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
@@ -224,8 +224,9 @@ app.post('/registration', function (request, response) {
     };
     //option
     let optionspost = {
-        host: 'http://mitapi.memeinfotech.com/vital/create',
+        host: 'http://mitapi.memeinfotech.com',
         port: 5020,
+        path: '/vital/create',
         method: 'POST',
         headers: postheaders
     };
@@ -249,7 +250,7 @@ app.post('/registration', function (request, response) {
 
 
             //post temperature data to meme server
-            let request = https.request(optionspost, (response) => {
+            let request = http.request(optionspost, (response) => {
                 console.log('statusCode:', response.statusCode);
 
                 response.on('data', (d) => {
