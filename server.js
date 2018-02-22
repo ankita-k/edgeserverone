@@ -224,9 +224,8 @@ app.post('/registration', function (request, response) {
     };
     //option
     let optionspost = {
-        host: 'http://mitapi.memeinfotech.com',
+        host: 'http://mitapi.memeinfotech.com/vital/create',
         port: 5020,
-        path: '/vital/create',
         method: 'POST',
         headers: postheaders
     };
