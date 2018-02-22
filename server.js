@@ -3,7 +3,7 @@ const SerialPort = require('serialport');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
-var http = require('http');
+var https = require('https');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
@@ -250,7 +250,7 @@ app.post('/registration', function (request, response) {
 
 
             //post temperature data to meme server
-            let request = http.request(optionspost, (response) => {
+            let request = https.request(optionspost, (response) => {
                 console.log('statusCode:', response.statusCode);
 
                 response.on('data', (d) => {
