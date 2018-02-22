@@ -11,9 +11,7 @@ var io = require('socket.io')(server);
 // const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 let arduinoPort = '/dev/ttyACM0';
-const port = new SerialPort(arduinoPort, {
-    baudRate: 115200
-});
+let port;
 
 /**
  * Import vitalStats model
@@ -57,6 +55,10 @@ io.on('connection', function (client) {
          */
         if (status == "temperature") {
 
+            port = new SerialPort(arduinoPort, {
+                baudRate: 115200
+            });
+
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -65,6 +67,12 @@ io.on('connection', function (client) {
                 } else {
                     console.log("buffer :", buffer.toString('hex'));
                 }
+            });
+
+            port.on('data', function (data) {
+                console.log("arduino data :", data.toString());
+                client.emit('value',
+                    { "value": data.toString(), "status": status });
             });
         }
         /**
@@ -145,16 +153,6 @@ io.on('connection', function (client) {
             buffer.writeInt8(7);
             port.write(buffer);
         }
-    });
-
-    /**
-    * Getting values from arduino
-    */
-    port.on('data', function (data) {
-        console.log("ok");
-        console.log("arduino data :", data.toString());
-        client.emit('value',
-            { "value": data.toString(), "status": status });
     });
 });
 
