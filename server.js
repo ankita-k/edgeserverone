@@ -144,6 +144,28 @@ io.on('connection', function (client) {
             buffer.writeInt8(7);
             port.write(buffer);
         }
+        /**
+         * Airflow Measurement
+         * Taking airflow as input from frontend in String format
+         *
+         * Send 8 from node.js to arduino for communication
+         */
+        if (status == "airflow") {
+            var buffer = new Buffer(1);
+            buffer.writeInt8(8);
+            port.write(buffer);
+        }
+        /**
+         * Snore Measurement
+         * Taking snore as input from frontend in String format
+         *
+         * Send 9 from node.js to arduino for communication
+         */
+        if (status == "snore") {
+            var buffer = new Buffer(1); 
+            buffer.writeInt8(9);
+            port.write(buffer);
+        }
     });
 
     /**
