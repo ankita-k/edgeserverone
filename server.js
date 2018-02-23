@@ -409,11 +409,11 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
-            if (bp) {
-                res.stats.push({
-                    "bp": bp
-                });
-            }
+            // if (bp) {
+            //     res.stats.push({
+            //         "bp": bp
+            //     });
+            // }
 
             if (airflow) {
                 res.stats.push({
