@@ -230,7 +230,7 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
 
-            axios.post('http://mitapi.memeinfotech.com:5020/vital/create', {
+            axios.post('https://memeapi.memeinfotech.com/vital/create', {
                 "name": name,
                 "email": email,
                 "individualId": individualId,
