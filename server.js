@@ -7,7 +7,7 @@ var axios = require('axios');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
-let _base = this;
+let id;
 const port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
@@ -238,7 +238,11 @@ app.post('/registration', function (request, response) {
                 "updatedBy": individualId
             }, axiosConfig)
                 .then(function (result) {
-                    console.log("result :", result);
+                    console.log("result :", result.data);
+
+                    //after post data to memeserver id is
+                    id = result.data.result._id;
+                    console.log("id :", id);
                 }).catch(function (error) {
                     console.log("error :", error);
                 });
@@ -284,6 +288,16 @@ app.put('/sensorValues', function (request, response) {
     /**For measuring EMG */
     let bp = request.body.bp;
 
+    /**calling rest api for meme server
+     * post operation
+    */
+
+    //header
+    let axiosConfig = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
 
     vitalStats.findOne({ _id: request.body._id }, function (error, res) {
         if (error) {
@@ -300,6 +314,18 @@ app.put('/sensorValues', function (request, response) {
                 res.stats.push({
                     "temperature": temperature
                 });
+
+                console.log("id after registration :", id);
+                //update data to memeserver
+                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                    "_id": id,
+                    "temperature": temperature
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
             }
 
             if (gsr) {
