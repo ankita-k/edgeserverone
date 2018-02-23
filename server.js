@@ -319,7 +319,9 @@ app.put('/sensorValues', function (request, response) {
                 //update data to memeserver
                 axios.put('https://memeapi.memeinfotech.com/vital/update', {
                     "_id": id,
-                    "temperature": temperature
+                    "stats": {
+                        "temperature": temperature
+                    }
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
