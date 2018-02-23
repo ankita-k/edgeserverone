@@ -3,7 +3,7 @@ const SerialPort = require('serialport');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
-var http = require('http');
+var axios = require('axios');
 const Readline = SerialPort.parsers.Readline;
 
 let baudRate;
@@ -208,27 +208,21 @@ app.post('/registration', function (request, response) {
     */
 
     //creating JSON object
-    JSONObject = JSON.stringify({
+    let postData = {
         "name": name,
         "email": email,
         "loginTime": loginTime,
         "individualId": individualId,
         "createdBy": individualId,
         "updatedBy": individualId
-    });
+    };
 
     //header
-    let postheaders = {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(JSONObject, 'utf8')
-    };
-    //option
-    let optionspost = {
-        host: 'http://mitapi.memeinfotech.com',
-        port: 5020,
-        path: '/vital/create',
-        method: 'POST',
-        headers: postheaders
+    let axiosConfig = {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            "Access-Control-Allow-Origin": "*",
+        }
     };
 
     let data = new vitalStats();
@@ -250,20 +244,12 @@ app.post('/registration', function (request, response) {
 
 
             //post temperature data to meme server
-            let request = http.request(optionspost, (response) => {
-                console.log('statusCode:', response.statusCode);
-
-                response.on('data', (d) => {
-                    process.stdout.write(d);
+            axios.post('http://mitapi.memeinfotech.com:5020/vital/create', postData, axiosConfig)
+                .then(function (result) {
+                    console.log("result :", result);
+                }).catch(function (error) {
+                    console.log("error :", error);
                 });
-            });
-
-            request.on('error', (error) => {
-                console.error("error in https :", error);
-            });
-
-            request.write(JSONObject);
-            request.end();
         }
     });
 });

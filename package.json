@@ -9,11 +9,10 @@
   "author": "Subhajit Nag",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",
-    "http": "0.0.0",
-    "https": "^1.0.0",
     "mongoose": "^5.0.4",
     "nodemon": "^1.14.12",
     "serialport": "^6.0.5",
