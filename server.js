@@ -201,27 +201,15 @@ app.post('/registration', function (request, response) {
     let name = request.body.name;
     let email = request.body.email;
     let individualId = request.body.individualId;
-    let loginTime = request.body.loginTime;
 
     /**calling rest api for meme server
      * post operation
     */
 
-    //creating JSON object
-    let postData = {
-        "name": name,
-        "email": email,
-        "loginTime": loginTime,
-        "individualId": individualId,
-        "createdBy": individualId,
-        "updatedBy": individualId
-    };
-
     //header
     let axiosConfig = {
         headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            "Access-Control-Allow-Origin": "*",
+            'Content-Type': 'application/json'
         }
     };
 
@@ -242,9 +230,13 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
 
-
-            //post temperature data to meme server
-            axios.post('http://mitapi.memeinfotech.com:5020/vital/create', postData, axiosConfig)
+            axios.post('http://mitapi.memeinfotech.com:5020/vital/create', {
+                "name": name,
+                "email": email,
+                "individualId": individualId,
+                "createdBy": individualId,
+                "updatedBy": individualId
+            }, axiosConfig)
                 .then(function (result) {
                     console.log("result :", result);
                 }).catch(function (error) {
