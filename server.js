@@ -4,24 +4,17 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-const Readline = SerialPort.parsers.Readline;
+// const Readline = SerialPort.parsers.Readline;
 
-let baudRate;
 let id;
-const port = new SerialPort('/dev/ttyACM0', {
+let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
-
-
-// const port = new SerialPort('/dev/ttyACM0', {
-//     baudRate: parseInt(_base.baudRate)
-// });
-
 
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
@@ -65,17 +58,20 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
-            // _base.baudRate = 115200;
-            // console.log("temperature" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(1);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("Temperature error :", error);
+                } else {
+                    console.log("Temperature :", buffer.toString('hex'));
 
-            parser.on('data', function (data) {
-                // console.log("baud rate :", _base.baudRate);
-                console.log("arduino data :", data);
-                client.emit('value',
-                    { "value": data, "status": status });
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
             });
         }
         /**
