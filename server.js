@@ -44,6 +44,24 @@ app.use(cors());
 //body-parser
 app.use(bodyParser.json());
 
+/**Update baudrate for blood presure  */
+function updatePortBP() {
+    port.update({
+        baudRate: 19200
+    }, function (data) {
+        console.log("port updated to 19200");
+    });
+}
+
+/**Update baudrate for blood presure  */
+function updatePortNormal() {
+    port.update({
+        baudRate: 115200
+    }, function (data) {
+        console.log("port updated to 115200");
+    });
+}
+
 io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
@@ -81,11 +99,21 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
-            // _base.baudRate = 115200;
-            // console.log("gsr" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(2);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("gsr error :", error);
+                } else {
+                    console.log("gsr :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * Glucometer Measurement
@@ -94,11 +122,21 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "glucometer") {
-            // _base.baudRate = 115200;
-            // console.log("glucometer" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(3);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("glucometer error :", error);
+                } else {
+                    console.log("glucometer :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * Body Position Measurement
@@ -107,9 +145,21 @@ io.on('connection', function (client) {
          * Send 4 from node.js to arduino for communication
          */
         if (status == "bodyposition") {
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(4);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("bodyposition error :", error);
+                } else {
+                    console.log("bodyposition :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * Blood Presure Measurement
@@ -118,11 +168,26 @@ io.on('connection', function (client) {
          * Send 5 from node.js to arduino for communication
          */
         if (status == "bp") {
-            // _base.baudRate = 19200;
-            // console.log("bp" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(5);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("bp error :", error);
+                } else {
+                    console.log("bp :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        updatePortBP();
+                        port.on('data', function (data) {
+                            if (data.toString() != 'a' && data.toString() != 'e' && data.toString() != 'i') {
+                                console.log("arduino data :", data.toString());
+                                client.emit('value',
+                                    { "value": data.toString(), "status": status });
+                            }
+                        });
+                        updatePortNormal();
+                    }
+                }
+            });
         }
         /**
          * ECG Measurement
@@ -131,11 +196,21 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
-            // _base.baudRate = 115200;
-            // console.log("ecg" + ' ' + _base.baudRate);
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(6);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("ecg error :", error);
+                } else {
+                    console.log("ecg :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * EMG Measurement
@@ -144,9 +219,21 @@ io.on('connection', function (client) {
          * Send 7 from node.js to arduino for communication
          */
         if (status == "emg") {
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(7);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("emg error :", error);
+                } else {
+                    console.log("emg :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * Airflow Measurement
@@ -155,9 +242,21 @@ io.on('connection', function (client) {
          * Send 8 from node.js to arduino for communication
          */
         if (status == "airflow") {
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(8);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("airflow error :", error);
+                } else {
+                    console.log("airflow :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
         /**
          * Snore Measurement
@@ -166,21 +265,23 @@ io.on('connection', function (client) {
          * Send 9 from node.js to arduino for communication
          */
         if (status == "snore") {
-            var buffer = new Buffer(1);
+            let buffer = new Buffer(1);
             buffer.writeInt8(9);
-            port.write(buffer);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("snore error :", error);
+                } else {
+                    console.log("snore :", buffer.toString('hex'));
+
+                    port.on('data', function (data) {
+                        console.log("arduino data :", data.toString());
+                        client.emit('value',
+                            { "value": data.toString(), "status": status });
+                    });
+                }
+            });
         }
     });
-
-    /**
-     * Getting values from arduino
-    */
-    // parser.on('data', function (data) {
-    //     // console.log("baud rate :", _base.baudRate);
-    //     console.log("arduino data :", data);
-    //     client.emit('value',
-    //         { "value": data, "status": status });
-    // });
 });
 
 /**
@@ -293,6 +394,9 @@ app.put('/sensorValues', function (request, response) {
 
     /**For measuring snore */
     let snore = request.body.snore;
+
+    /**For measuring bp */
+    let bp = request.body.bp;
 
     /**calling rest api for meme server
      * post operation
