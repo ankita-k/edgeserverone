@@ -76,6 +76,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -99,6 +100,7 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer, function (error) {
@@ -184,7 +186,6 @@ io.on('connection', function (client) {
                                     { "value": data.toString(), "status": status });
                             }
                         });
-                        // updatePortNormal();
                     }
                 }
             });
