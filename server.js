@@ -184,7 +184,7 @@ io.on('connection', function (client) {
                                     { "value": data.toString(), "status": status });
                             }
                         });
-                        updatePortNormal();
+                        // updatePortNormal();
                     }
                 }
             });
