@@ -1,5 +1,5 @@
 var express = require('express');
-const SerialPort = require('serialport');
+const SerialPort = require('serialport-v4');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -70,6 +70,13 @@ io.on('connection', function (client) {
             var buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer);
+
+            parser.on('data', function (data) {
+                // console.log("baud rate :", _base.baudRate);
+                console.log("arduino data :", data);
+                client.emit('value',
+                    { "value": data, "status": status });
+            });
         }
         /**
          * GSR Measurement
@@ -172,12 +179,12 @@ io.on('connection', function (client) {
     /**
      * Getting values from arduino
     */
-    parser.on('data', function (data) {
-        // console.log("baud rate :", _base.baudRate);
-        console.log("arduino data :", data);
-        client.emit('value',
-            { "value": data, "status": status });
-    });
+    // parser.on('data', function (data) {
+    //     // console.log("baud rate :", _base.baudRate);
+    //     console.log("arduino data :", data);
+    //     client.emit('value',
+    //         { "value": data, "status": status });
+    // });
 });
 
 /**
@@ -409,11 +416,11 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
-            // if (bp) {
-            //     res.stats.push({
-            //         "bp": bp
-            //     });
-            // }
+            if (bp) {
+                res.stats.push({
+                    "bp": bp
+                });
+            }
 
             if (airflow) {
                 res.stats.push({
