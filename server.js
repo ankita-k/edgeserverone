@@ -289,14 +289,14 @@ io.on('connection', function (client) {
         }
 
         /**
-         * Snore Measurement
-         * Taking snore as input from frontend in String format
+         * spirometer Measurement
+         * Taking spirometer as input from frontend in String format
          *
-         * Send 9 from node.js to arduino for communication
+         * Send 0 from node.js to arduino for communication
          */
         if (status == "spirometer") {
             let buffer = new Buffer(1);
-            buffer.writeInt8(10);
+            buffer.writeInt8(0);
             port.write(buffer, function (error) {
                 if (error) {
                     console.log("snore error :", error);
@@ -429,6 +429,9 @@ app.put('/sensorValues', function (request, response) {
 
     /**For measuring bp */
     let bp = request.body.bp;
+
+    /**For measuring spirometer */
+    let spirometer = request.body.spirometer;
 
     /**calling rest api for meme server
      * post operation
@@ -583,6 +586,37 @@ app.put('/sensorValues', function (request, response) {
                     "_id": id,
                     "stats": {
                         "snore": snore
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+            res.save(function (error, result) {
+                if (error) {
+                    details.error = true;
+                    details.message = `Sensor details not saved.`;
+                    response.status(404).json(details);
+                } else if (result) {
+                    details.error = false;
+                    details.sensorDetails = result;
+                    details.message = `Sensor Details.`;
+                    response.status(200).json(details);
+                }
+            });
+
+            if (spirometer) {
+                res.stats.push({
+                    "spirometer": spirometer
+                });
+
+                //update data to memeserver
+                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "spirometer": spirometer
                     }
                 }, axiosConfig)
                     .then(function (result) {
