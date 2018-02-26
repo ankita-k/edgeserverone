@@ -208,6 +208,7 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(6);
             port.write(buffer, function (error) {
@@ -231,6 +232,7 @@ io.on('connection', function (client) {
          * Send 7 from node.js to arduino for communication
          */
         if (status == "emg") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(7);
             port.write(buffer, function (error) {
@@ -254,6 +256,7 @@ io.on('connection', function (client) {
          * Send 8 from node.js to arduino for communication
          */
         if (status == "airflow") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(8);
             port.write(buffer, function (error) {
@@ -277,6 +280,7 @@ io.on('connection', function (client) {
          * Send 9 from node.js to arduino for communication
          */
         if (status == "snore") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(9);
             port.write(buffer, function (error) {
