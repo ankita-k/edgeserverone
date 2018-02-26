@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var axios = require('axios');
 // const Readline = SerialPort.parsers.Readline;
 
+let id;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
@@ -555,6 +556,19 @@ app.put('/sensorValues', function (request, response) {
                 res.stats.push({
                     "bp": bp
                 });
+
+                //update data to memeserver
+                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "bp": bp
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
             }
 
             if (airflow) {
