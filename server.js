@@ -608,19 +608,6 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
-            res.save(function (error, result) {
-                if (error) {
-                    details.error = true;
-                    details.message = `Sensor details not saved.`;
-                    response.status(404).json(details);
-                } else if (result) {
-                    details.error = false;
-                    details.sensorDetails = result;
-                    details.message = `Sensor Details.`;
-                    response.status(200).json(details);
-                }
-            });
-
             if (spirometer) {
                 res.stats.push({
                     "spirometer": spirometer
