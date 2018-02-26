@@ -73,7 +73,6 @@ function updatePortSpirometer() {
 io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
-    let _base = this;
     client.on("start", function (data) {
         status = data.status;
         console.log("status :", status);
@@ -191,7 +190,7 @@ io.on('connection', function (client) {
                     if (buffer.toString('hex')) {
                         updatePortBP();
                         port.on('data', function (data) {
-                            if (data.toString() != 'a' && data.toString() != 'e' && data.toString() != 'i') {
+                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
                                 console.log("arduino data :", data.toString());
                                 client.emit('value',
                                     { "value": data.toString(), "status": status });
