@@ -84,7 +84,6 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -92,12 +91,14 @@ io.on('connection', function (client) {
                     console.log("Temperature error :", error);
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
-
-                    port.on('data', function (data) {
-                        console.log("arduino data :", data.toString());
-                        client.emit('value',
-                            { "value": data.toString(), "status": status });
-                    });
+                    if (buffer.toString('hex')) {
+                        updatePortNormal();
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data.toString());
+                            client.emit('value',
+                                { "value": data.toString(), "status": status });
+                        });
+                    }
                 }
             });
         }
@@ -180,7 +181,6 @@ io.on('connection', function (client) {
          * Send 5 from node.js to arduino for communication
          */
         if (status == "bp") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer, function (error) {
