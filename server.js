@@ -6,7 +6,6 @@ var bodyParser = require('body-parser');
 var axios = require('axios');
 // const Readline = SerialPort.parsers.Readline;
 
-let id;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
@@ -53,12 +52,21 @@ function updatePortBP() {
     });
 }
 
-/**Update baudrate for blood presure  */
+/**Update baudrate for normal presure  */
 function updatePortNormal() {
     port.update({
         baudRate: 115200
     }, function (data) {
         console.log("port updated to 115200");
+    });
+}
+
+/**Update baudrate for spirometer presure  */
+function updatePortSpirometer() {
+    port.update({
+        baudRate: 9600
+    }, function (data) {
+        console.log("port updated to 9600");
     });
 }
 
@@ -124,6 +132,7 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "glucometer") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(3);
             port.write(buffer, function (error) {
@@ -147,6 +156,7 @@ io.on('connection', function (client) {
          * Send 4 from node.js to arduino for communication
          */
         if (status == "bodyposition") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(4);
             port.write(buffer, function (error) {
@@ -170,6 +180,7 @@ io.on('connection', function (client) {
          * Send 5 from node.js to arduino for communication
          */
         if (status == "bp") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer, function (error) {
@@ -197,6 +208,7 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(6);
             port.write(buffer, function (error) {
@@ -220,6 +232,7 @@ io.on('connection', function (client) {
          * Send 7 from node.js to arduino for communication
          */
         if (status == "emg") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(7);
             port.write(buffer, function (error) {
@@ -243,6 +256,7 @@ io.on('connection', function (client) {
          * Send 8 from node.js to arduino for communication
          */
         if (status == "airflow") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(8);
             port.write(buffer, function (error) {
@@ -266,6 +280,7 @@ io.on('connection', function (client) {
          * Send 9 from node.js to arduino for communication
          */
         if (status == "snore") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(9);
             port.write(buffer, function (error) {
@@ -279,6 +294,33 @@ io.on('connection', function (client) {
                         client.emit('value',
                             { "value": data.toString(), "status": status });
                     });
+                }
+            });
+        }
+
+        /**
+         * Snore Measurement
+         * Taking snore as input from frontend in String format
+         *
+         * Send 9 from node.js to arduino for communication
+         */
+        if (status == "spirometer") {
+            updatePortNormal();
+            let buffer = new Buffer(1);
+            buffer.writeInt8(10);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("snore error :", error);
+                } else {
+                    console.log("snore :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        updatePortSpirometer();
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data.toString());
+                            client.emit('value',
+                                { "value": data.toString(), "status": status });
+                        });
+                    }
                 }
             });
         }
