@@ -8,8 +8,7 @@ var axios = require('axios');
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200,
-    parser: new SerialPort.parsers.Readline({ delimiter: '\r\n' })
+    baudRate: 115200
 });
 
 var app = express();
@@ -85,6 +84,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication
          */
         if (status == "temperature") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
