@@ -92,7 +92,6 @@ io.on('connection', function (client) {
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        updatePortNormal();
                         port.on('data', function (data) {
                             console.log("arduino data :", data.toString());
                             client.emit('value',
@@ -109,7 +108,6 @@ io.on('connection', function (client) {
          * Send 2 from node.js to arduino for communication
          */
         if (status == "gsr") {
-            console.log(port);
             let buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer, function (error) {
@@ -133,7 +131,6 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "glucometer") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(3);
             port.write(buffer, function (error) {
@@ -157,7 +154,6 @@ io.on('connection', function (client) {
          * Send 4 from node.js to arduino for communication
          */
         if (status == "bodyposition") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(4);
             port.write(buffer, function (error) {
@@ -208,7 +204,6 @@ io.on('connection', function (client) {
          * Send 6 from node.js to arduino for communication
          */
         if (status == "ecg") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(6);
             port.write(buffer, function (error) {
@@ -232,7 +227,6 @@ io.on('connection', function (client) {
          * Send 7 from node.js to arduino for communication
          */
         if (status == "emg") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(7);
             port.write(buffer, function (error) {
@@ -256,7 +250,6 @@ io.on('connection', function (client) {
          * Send 8 from node.js to arduino for communication
          */
         if (status == "airflow") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(8);
             port.write(buffer, function (error) {
@@ -280,7 +273,6 @@ io.on('connection', function (client) {
          * Send 9 from node.js to arduino for communication
          */
         if (status == "snore") {
-            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(9);
             port.write(buffer, function (error) {
@@ -370,7 +362,6 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User details not saved.`;
             response.status(404).json(userDetails);
         } else if (result) {
-            console.log("User registration result :", result);
             userDetails.error = false;
             userDetails.userRegistration = result;
             userDetails.message = `User Registration Details.`;
@@ -524,6 +515,19 @@ app.put('/sensorValues', function (request, response) {
                 res.stats.push({
                     "bodyposition": bodyposition
                 });
+
+                //update data to memeserver
+                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "bodyposition": bodyposition
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
             }
             if (ecg) {
                 res.stats.push({
