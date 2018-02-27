@@ -8,7 +8,8 @@ var axios = require('axios');
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200
+    baudRate: 115200,
+    parser: new SerialPort.parsers.Readline({ delimiter: '\r\n' })
 });
 
 var app = express();
