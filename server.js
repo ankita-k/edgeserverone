@@ -84,65 +84,63 @@ io.on('connection', function (client) {
          *
          * Send 1 from node.js to arduino for communication 
          */
+        if (status == "temperature") {
+            let buffer = new Buffer(1);
+            buffer.writeInt8(1);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("Temperature error :", error);
+                } else {
+                    console.log("Temperature :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        updatePortNormal();
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data.toString());
+                            client.emit('value',
+                                { "value": data.toString(), "status": status });
+                        });
+                    }
+                }
+            });
+        }
+
+        // baud rate test
         // if (status == "temperature") {
-        //     setTimeout(function () {
-        //         let buffer = new Buffer(1);
-        //         buffer.writeInt8(1);
+        //     let buffer = new Buffer(1);
+        //     buffer.writeInt8(1);
+        //     port.update({
+        //         baudRate: 19200
+        //     }, function (data) {
+        //         console.log("port updated to 115200");
         //         port.write(buffer, function (error) {
         //             if (error) {
         //                 console.log("Temperature error :", error);
         //             } else {
-        //                 console.log("Temperature :", buffer.toString('hex'));
-        //                 if (buffer.toString('hex')) {
-        //                     updatePortNormal();
-        //                     port.on('data', function (data) {
-        //                         console.log("arduino data :", data.toString());
-        //                         client.emit('value',
-        //                             { "value": data.toString(), "status": status });
+        //                 port.update({
+        //                     baudRate: 115200
+        //                 }, function (data) {
+        //                     console.log("port updated to 115200");
+        //                     port.write(buffer, function (error) {
+        //                         if (error) {
+        //                             console.log("Temperature error :", error);
+        //                         } else {
+        //                             console.log("Temperature :", buffer.toString('hex'));
+        //                             if (buffer.toString('hex')) {
+        //                                 updatePortNormal();
+        //                                 port.on('data', function (data) {
+        //                                     console.log("arduino data :", data.toString());
+        //                                     client.emit('value',
+        //                                         { "value": data.toString(), "status": status });
+        //                                 });
+        //                             }
+        //                         }
         //                     });
-        //                 }
+        //                 });
         //             }
         //         });
-        //     }, 1000);
+        //     });
+
         // }
-
-        // baud rate test
-        if (status == "temperature") {
-            let buffer = new Buffer(1);
-            buffer.writeInt8(1);
-            port.update({
-                baudRate: 19200
-            }, function (data) {
-                console.log("port updated to 115200");
-                port.write(buffer, function (error) {
-                    if (error) {
-                        console.log("Temperature error :", error);
-                    } else {
-                        port.update({
-                            baudRate: 115200
-                        }, function (data) {
-                            console.log("port updated to 115200");
-                            port.write(buffer, function (error) {
-                                if (error) {
-                                    console.log("Temperature error :", error);
-                                } else {
-                                    console.log("Temperature :", buffer.toString('hex'));
-                                    if (buffer.toString('hex')) {
-                                        updatePortNormal();
-                                        port.on('data', function (data) {
-                                            console.log("arduino data :", data.toString());
-                                            client.emit('value',
-                                                { "value": data.toString(), "status": status });
-                                        });
-                                    }
-                                }
-                            });
-                        });
-                    }
-                });
-            });
-
-        }
 
         /**
          * GSR Measurement
