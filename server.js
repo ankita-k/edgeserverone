@@ -84,55 +84,24 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
-            setTimeout(function () {
-                let buffer = new Buffer(1);
-                buffer.writeInt8(1);
-                port.write(buffer, function (error) {
-                    if (error) {
-                        console.log("Temperature error :", error);
-                    } else {
-                        console.log("Temperature :", buffer.toString('hex'));
-                        if (buffer.toString('hex')) {
-                            updatePortNormal();
-                            port.on('data', function (data) {
-                                console.log("arduino data :", data.toString());
-                                client.emit('value',
-                                    { "value": data.toString(), "status": status });
-                            });
-                        }
-                    }
-                });
-            }, 2000);
-        }
-
-        /**
-         * Blood Presure Measurement
-         * Taking bp as input from frontend in String format
-         *
-         * Send 5 from node.js to arduino for communication
-         */
-        if (status == "bp") {
             let buffer = new Buffer(1);
-            buffer.writeInt8(5);
+            buffer.writeInt8(1);
             port.write(buffer, function (error) {
                 if (error) {
-                    console.log("bp error :", error);
+                    console.log("Temperature error :", error);
                 } else {
-                    console.log("bp :", buffer.toString('hex'));
+                    console.log("Temperature :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        updatePortBP();
+                        updatePortNormal();
                         port.on('data', function (data) {
-                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
-                                console.log("arduino data :", data.toString());
-                                client.emit('value',
-                                    { "value": data.toString(), "status": status });
-                            }
+                            console.log("arduino data :", data.toString());
+                            client.emit('value',
+                                { "value": data.toString(), "status": status });
                         });
                     }
                 }
             });
         }
-
         /**
          * GSR Measurement
          * Taking gsr as input from frontend in String format
@@ -199,6 +168,33 @@ io.on('connection', function (client) {
                         client.emit('value',
                             { "value": data.toString(), "status": status });
                     });
+                }
+            });
+        }
+        /**
+         * Blood Presure Measurement
+         * Taking bp as input from frontend in String format
+         *
+         * Send 5 from node.js to arduino for communication
+         */
+        if (status == "bp") {
+            let buffer = new Buffer(1);
+            buffer.writeInt8(5);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("bp error :", error);
+                } else {
+                    console.log("bp :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        updatePortBP();
+                        port.on('data', function (data) {
+                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
+                                console.log("arduino data :", data.toString());
+                                client.emit('value',
+                                    { "value": data.toString(), "status": status });
+                            }
+                        });
+                    }
                 }
             });
         }
