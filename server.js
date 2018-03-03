@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-const Readline = SerialPort.parsers.Readline;
+// const Readline = SerialPort.parsers.Readline;
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -14,7 +14,7 @@ let port = new SerialPort('/dev/ttyACM0', {
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
@@ -96,11 +96,11 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                         if (buffer.toString('hex')) {
                             updatePortNormal();
-                            parser.on('data', function (data) {
+                            port.on('data', function (data) {
                                 if (time == 2) {
-                                    console.log("arduino data :", data);
+                                    console.log("arduino data :", data.toString());
                                     client.emit('value',
-                                        { "value": data, "status": status });
+                                        { "value": data.toString(), "status": status });
                                     clearInterval(interval);
                                 }
                             });
@@ -126,11 +126,11 @@ io.on('connection', function (client) {
                     console.log("bp :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
                         updatePortBP();
-                        parser.on('data', function (data) {
-                            if (data != 'a' || data != 'e' || data != 'i') {
-                                console.log("arduino data :", data);
+                        port.on('data', function (data) {
+                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
+                                console.log("arduino data :", data.toString());
                                 client.emit('value',
-                                    { "value": data, "status": status });
+                                    { "value": data.toString(), "status": status });
                             }
                         });
                     }
