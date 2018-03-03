@@ -87,6 +87,7 @@ io.on('connection', function (client) {
         if (status == "temperature") {
             let interval = setInterval(function () {
                 time++;
+                console.log("time :", time);
                 let buffer = new Buffer(1);
                 buffer.writeInt8(1);
                 port.write(buffer, function (error) {
