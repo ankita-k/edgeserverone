@@ -92,7 +92,7 @@ io.on('connection', function (client) {
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        updatePortNormal();
+                        updatePortNormal ();
                         port.on('data', function (data) {
                             console.log("arduino data :", data.toString());
                             client.emit('value',
