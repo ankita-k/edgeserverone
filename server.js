@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-// const Readline = SerialPort.parsers.Readline;
+const Readline = SerialPort.parsers.Readline;
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -14,7 +14,7 @@ let port = new SerialPort('/dev/ttyACM0', {
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
@@ -81,27 +81,63 @@ io.on('connection', function (client) {
          * Body Temparature Measurement
          * Taking temperature as input from frontend in String format
          *
-         * Send 1 from node.js to arduino for communication
+         * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
-            updatePortNormal();
+            let time = 0;
+            let interval = setInterval(function () {
+                time++;
+                let buffer = new Buffer(1);
+                buffer.writeInt8(1);
+                port.write(buffer, function (error) {
+                    if (error) {
+                        console.log("Temperature error :", error);
+                    } else {
+                        console.log("Temperature :", buffer.toString('hex'));
+                        if (buffer.toString('hex')) {
+                            updatePortNormal();
+                            parser.on('data', function (data) {
+                                if (time == 2) {
+                                    console.log("arduino data :", data);
+                                    client.emit('value',
+                                        { "value": data, "status": status });
+                                    clearInterval(interval);
+                                }
+                            });
+                        }
+                    }
+                });
+            }, 1000);
+        }
+
+        /**
+         * Blood Presure Measurement
+         * Taking bp as input from frontend in String format
+         *
+         * Send 5 from node.js to arduino for communication
+         */
+        if (status == "bp") {
             let buffer = new Buffer(1);
-            buffer.writeInt8(1);
+            buffer.writeInt8(5);
             port.write(buffer, function (error) {
                 if (error) {
-                    console.log("Temperature error :", error);
+                    console.log("bp error :", error);
                 } else {
-                    console.log("Temperature :", buffer.toString('hex'));
+                    console.log("bp :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data.toString());
-                            client.emit('value',
-                                { "value": data.toString(), "status": status });
+                        updatePortBP();
+                        parser.on('data', function (data) {
+                            if (data != 'a' || data != 'e' || data != 'i') {
+                                console.log("arduino data :", data);
+                                client.emit('value',
+                                    { "value": data, "status": status });
+                            }
                         });
                     }
                 }
             });
         }
+
         /**
          * GSR Measurement
          * Taking gsr as input from frontend in String format
@@ -168,33 +204,6 @@ io.on('connection', function (client) {
                         client.emit('value',
                             { "value": data.toString(), "status": status });
                     });
-                }
-            });
-        }
-        /**
-         * Blood Presure Measurement
-         * Taking bp as input from frontend in String format
-         *
-         * Send 5 from node.js to arduino for communication
-         */
-        if (status == "bp") {
-            let buffer = new Buffer(1);
-            buffer.writeInt8(5);
-            port.write(buffer, function (error) {
-                if (error) {
-                    console.log("bp error :", error);
-                } else {
-                    console.log("bp :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        updatePortBP();
-                        port.on('data', function (data) {
-                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
-                                console.log("arduino data :", data.toString());
-                                client.emit('value',
-                                    { "value": data.toString(), "status": status });
-                            }
-                        });
-                    }
                 }
             });
         }
