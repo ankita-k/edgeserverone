@@ -7,7 +7,6 @@ var axios = require('axios');
 // const Readline = SerialPort.parsers.Readline;
 
 let id;
-let time = 0;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
@@ -85,9 +84,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
-            let interval = setInterval(function () {
-                time++;
-                console.log("time :", time);
+            setTimeout(function () {
                 let buffer = new Buffer(1);
                 buffer.writeInt8(1);
                 port.write(buffer, function (error) {
@@ -98,17 +95,14 @@ io.on('connection', function (client) {
                         if (buffer.toString('hex')) {
                             updatePortNormal();
                             port.on('data', function (data) {
-                                if (time == 2) {
-                                    console.log("arduino data :", data.toString());
-                                    client.emit('value',
-                                        { "value": data.toString(), "status": status });
-                                    clearInterval(interval);
-                                }
+                                console.log("arduino data :", data.toString());
+                                client.emit('value',
+                                    { "value": data.toString(), "status": status });
                             });
                         }
                     }
                 });
-            }, 1000);
+            }, 2000);
         }
 
         /**
