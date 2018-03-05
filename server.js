@@ -107,6 +107,9 @@ io.on('connection', function (client) {
                                 client.emit('value',
                                     { "value": data.toString(), "status": status });
                             });
+                            port.close(function () {
+                                console.log("port closed temp");
+                            })
                         }
                     }
                 });
