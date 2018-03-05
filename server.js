@@ -84,6 +84,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
+            updatePortNormal();
             let buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -92,11 +93,6 @@ io.on('connection', function (client) {
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        port.update({
-                            baudRate: 115200
-                        }, function (data) {
-                            console.log("port updated to 115200");
-                        });
                         port.on('data', function (data) {
                             console.log("arduino data :", data.toString());
                             client.emit('value',
@@ -190,12 +186,7 @@ io.on('connection', function (client) {
                 } else {
                     console.log("bp :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
-                        // updatePortBP();
-                        port.update({
-                            baudRate: 19200
-                        }, function (data) {
-                            console.log("port updated to 19200");
-                        });
+                        updatePortBP();
                         port.on('data', function (data) {
                             if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
                                 if (data.toString()) {
@@ -208,6 +199,7 @@ io.on('connection', function (client) {
                     }
                 }
             });
+            updatePortNormal();
         }
         /**
          * ECG Measurement
