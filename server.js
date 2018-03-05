@@ -1,5 +1,5 @@
 var express = require('express');
-const SerialPort = require('serialport-v4');
+const SerialPort = require('serialport-v5');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -47,6 +47,14 @@ app.use(bodyParser.json());
 
 /**Update baudrate for blood presure  */
 function updatePortBP() {
+    port.update({
+        baudRate: 19200
+    }, function (data) {
+        console.log("port updated to 19200");
+    });
+}
+
+function updatePort1() {
     port.update({
         baudRate: 19200
     }, function (data) {
@@ -221,13 +229,13 @@ io.on('connection', function (client) {
         if (status == "bp") {
             let buffer = new Buffer(1);
             buffer.writeInt8(5);
-            port.write(buffer, function (error) {
+            port.write(buffer, function (error,result) {
                 if (error) {
                     console.log("bp error :", error);
                 } else {
-                    console.log("bp :", buffer.toString('hex'));
+                    console.log("bp :", result);
                     if (buffer.toString('hex')) {
-                        updatePortBP();
+                        updatePort1();
                         port.on('data', function (data) {
                             if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
                                 console.log("arduino data :", data.toString());
