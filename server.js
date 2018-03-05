@@ -191,16 +191,14 @@ io.on('connection', function (client) {
                                 if (data.toString()) {
                                     console.log("arduino data :", data.toString());
                                     client.emit('value',
-                                        { "value": data.toString(), "status": status }); 
+                                        { "value": data.toString(), "status": status });
                                 }
                             }
                         });
-                        setTimeout(function () {
-                            updatePortNormal();
-                        }, 15000);
                     }
                 }
             });
+            updatePortNormal();
         }
         /**
          * ECG Measurement
