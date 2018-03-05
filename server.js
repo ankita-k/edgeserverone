@@ -1,5 +1,6 @@
 var express = require('express');
-const SerialPort = require('serialport-v4');
+const SerialPort = require('serialport');
+const Readline = SerialPort.parsers.Readline;
 
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
@@ -8,6 +9,7 @@ let port = new SerialPort('/dev/ttyACM0', {
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 io.on('connection', function (client) {
     console.log("Socket connected !");
@@ -29,13 +31,6 @@ io.on('connection', function (client) {
                     console.log("Temperature error :", error);
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data.toString());
-                            client.emit('value',
-                                { "value": data.toString(), "status": status });
-                        });
-                    }
                 }
             });
         }
@@ -53,16 +48,12 @@ io.on('connection', function (client) {
                     console.log("gsr error :", error);
                 } else {
                     console.log("gsr :", buffer.toString('hex'));
-                    if (buffer.toString()) {
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data.toString());
-                            client.emit('value',
-                                { "value": data.toString(), "status": status });
-                        });
-                    }
                 }
             });
         }
+    });
+    parser.on('data', function (data) {
+        console.log("Data from arduino :", data);
     });
 });
 
