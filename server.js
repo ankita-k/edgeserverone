@@ -106,10 +106,10 @@ io.on('connection', function (client) {
                                 console.log("arduino data :", data.toString());
                                 client.emit('value',
                                     { "value": data.toString(), "status": status });
+                                port.close(function () {
+                                    console.log("port closed temp");
+                                });
                             });
-                            port.close(function () {
-                                console.log("port closed temp");
-                            })
                         }
                     }
                 });
@@ -216,14 +216,12 @@ io.on('connection', function (client) {
                                         console.log("arduino data :", data.toString());
                                         client.emit('value',
                                             { "value": data.toString(), "status": status });
+                                        port.close(function () {
+                                            console.log("port closed");
+                                        });
                                     }
                                 }
                             });
-                            setTimeout(function () {
-                                port.close(function () {
-                                    console.log("port closed");
-                                });
-                            }, 30000);
                         }
                     }
                 });
