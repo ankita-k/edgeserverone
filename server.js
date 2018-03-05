@@ -88,27 +88,30 @@ io.on('connection', function (client) {
             port = new SerialPort('/dev/ttyACM0', {
                 baudRate: 115200
             });
-            let buffer = new Buffer(1);
-            buffer.writeInt8(1);
-            port.write(buffer, function (error) {
-                if (error) {
-                    console.log("Temperature error :", error);
-                } else {
-                    console.log("Temperature :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        port.update({
-                            baudRate: 115200
-                        }, function (data) {
-                            console.log("port updated to 115200");
-                        });
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data.toString());
-                            client.emit('value',
-                                { "value": data.toString(), "status": status });
-                        });
+            port.on('open', function () {
+                let buffer = new Buffer(1);
+                buffer.writeInt8(1);
+                port.write(buffer, function (error) {
+                    if (error) {
+                        console.log("Temperature error :", error);
+                    } else {
+                        console.log("Temperature :", buffer.toString('hex'));
+                        if (buffer.toString('hex')) {
+                            port.update({
+                                baudRate: 115200
+                            }, function (data) {
+                                console.log("port updated to 115200");
+                            });
+                            port.on('data', function (data) {
+                                console.log("arduino data :", data.toString());
+                                client.emit('value',
+                                    { "value": data.toString(), "status": status });
+                            });
+                        }
                     }
-                }
+                });
             });
+
         }
         /**
          * GSR Measurement
@@ -189,37 +192,38 @@ io.on('connection', function (client) {
             port = new SerialPort('/dev/ttyACM0', {
                 baudRate: 115200
             });
-            let buffer = new Buffer(1);
-            buffer.writeInt8(5);
-            port.write(buffer, function (error) {
-                if (error) {
-                    console.log("bp error :", error);
-                } else {
-                    console.log("bp :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        // updatePortBP();
-                        port.update({
-                            baudRate: 19200
-                        }, function (data) {
-                            console.log("port updated to 19200");
-                        });
-                        port.on('data', function (data) {
-                            if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
-                                if (data.toString()) {
-                                    console.log("arduino data :", data.toString());
-                                    client.emit('value',
-                                        { "value": data.toString(), "status": status });
-                                }
-                            }
-                        });
-                        setTimeout(function () {
-                            port.close(function () {
-                                console.log("port closed");
-                                console.log(port.settings.baudRate);
+            port.on('open', function () {
+                let buffer = new Buffer(1);
+                buffer.writeInt8(5);
+                port.write(buffer, function (error) {
+                    if (error) {
+                        console.log("bp error :", error);
+                    } else {
+                        console.log("bp :", buffer.toString('hex'));
+                        if (buffer.toString('hex')) {
+                            // updatePortBP();
+                            port.update({
+                                baudRate: 19200
+                            }, function (data) {
+                                console.log("port updated to 19200");
                             });
-                        }, 30000);
+                            port.on('data', function (data) {
+                                if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
+                                    if (data.toString()) {
+                                        console.log("arduino data :", data.toString());
+                                        client.emit('value',
+                                            { "value": data.toString(), "status": status });
+                                    }
+                                }
+                            });
+                            setTimeout(function () {
+                                port.close(function () {
+                                    console.log("port closed");
+                                });
+                            }, 30000);
+                        }
                     }
-                }
+                });
             });
         }
         /**
