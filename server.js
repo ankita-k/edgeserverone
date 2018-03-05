@@ -189,7 +189,6 @@ io.on('connection', function (client) {
             port = new SerialPort('/dev/ttyACM0', {
                 baudRate: 115200
             });
-            console.log(port.settings.baudRate);
             let buffer = new Buffer(1);
             buffer.writeInt8(5);
             port.write(buffer, function (error) {
@@ -204,7 +203,6 @@ io.on('connection', function (client) {
                         }, function (data) {
                             console.log("port updated to 19200");
                         });
-                        console.log(port.settings.baudRate);
                         port.on('data', function (data) {
                             if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
                                 if (data.toString()) {
