@@ -214,13 +214,12 @@ io.on('connection', function (client) {
                                 }
                             }
                         });
-                        port.close(function () {
-                            console.log("port closed");
-                            // port = new SerialPort('/dev/ttyACM0', {
-                            //     baudRate: 115200
-                            // });
-                            console.log(port.settings.baudRate);
-                        });
+                        setTimeout(function () {
+                            port.close(function () {
+                                console.log("port closed");
+                                console.log(port.settings.baudRate);
+                            });
+                        }, 30000);
                     }
                 }
             });
