@@ -197,7 +197,7 @@ io.on('connection', function (client) {
                         });
                         setTimeout(function () {
                             updatePortNormal();
-                        }, 10000);
+                        }, 15000);
                     }
                 }
             });
