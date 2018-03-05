@@ -188,9 +188,14 @@ io.on('connection', function (client) {
                         updatePortBP();
                         port.on('data', function (data) {
                             if (data.toString() != 'a' || data.toString() != 'e' || data.toString() != 'i') {
-                                console.log("arduino data :", data.toString());
-                                client.emit('value',
-                                    { "value": data.toString(), "status": status });
+                                if (data.toString()) {
+                                    console.log("arduino data :", data.toString());
+                                    client.emit('value',
+                                        { "value": data.toString(), "status": status });
+                                    setTimeout(function () {
+                                        updatePortNormal();
+                                    }, 6000);
+                                }
                             }
                         });
                     }
