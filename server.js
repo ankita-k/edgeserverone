@@ -10,7 +10,7 @@ let port = new SerialPort('/dev/ttyACM0', {
 
 var app = express();
 
-setTimeout(function () {
+setInterval(function () {
     let buffer = new Buffer(1);
     buffer.writeInt8(1);
     port.write(buffer, function (error) {
