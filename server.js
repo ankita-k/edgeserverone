@@ -191,13 +191,13 @@ io.on('connection', function (client) {
                                 if (data.toString()) {
                                     console.log("arduino data :", data.toString());
                                     client.emit('value',
-                                        { "value": data.toString(), "status": status });
-                                    setTimeout(function () {
-                                        updatePortNormal();
-                                    }, 6000);
+                                        { "value": data.toString(), "status": status }); 
                                 }
                             }
                         });
+                        setTimeout(function () {
+                            updatePortNormal();
+                        }, 10000);
                     }
                 }
             });
