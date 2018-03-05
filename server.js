@@ -192,14 +192,14 @@ io.on('connection', function (client) {
                                     console.log("arduino data :", data.toString());
                                     client.emit('value',
                                         { "value": data.toString(), "status": status });
+                                    port.on('close', function () {
+                                        console.log("port closed");
+                                        let port = new SerialPort('/dev/ttyACM0', {
+                                            baudRate: 115200
+                                        });
+                                    });
                                 }
                             }
-                        });
-                        port.on('close', function () {
-                            console.log("port closed");
-                            let port = new SerialPort('/dev/ttyACM0', {
-                                baudRate: 115200
-                            });
                         });
                     }
                 }
