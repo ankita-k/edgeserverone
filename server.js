@@ -62,7 +62,7 @@ setTimeout(function () {
             console.log("port error :", error);
         } else {
             // console.log(port.options.baudRate);
-            console.log("buffer :", buffer.toString('hex'));
+            console.log("buffer is :", buffer.toString('hex'));
             // if (buffer.toString('hex')) {
             //     updatePort();
             //     port.on('data', function (data) {
