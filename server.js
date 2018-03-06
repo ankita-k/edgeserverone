@@ -26,7 +26,9 @@ let vitalStats = require('./models/vitalStats');
  * connect to mongodb
 */
 // mongoose.connect('mongodb://127.0.0.1:27017/edge');
-// mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
+// mongoose.connect('mongodb://test:passwoq
+
+rd@ds211558.mlab.com: 11558 / ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -76,6 +78,11 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
             let buffer = new Buffer(1);
             buffer.writeInt8(1);
             port.write(buffer, function (error) {
@@ -83,13 +90,6 @@ io.on('connection', function (client) {
                     console.log("Temperature error :", error);
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data);
-                            client.emit('value',
-                                { "value": data, "status": status });
-                        });
-                    }
                 }
             });
         }
@@ -137,20 +137,15 @@ io.on('connection', function (client) {
                         }, function (data) {
                             console.log("port updated to 19200");
                         });
-                        port.on('data', function (data) {
-                            console.log("arduino data :", data);
-                            client.emit('value',
-                                { "value": data, "status": status });
-                        });
-                        port.update({
-                            baudRate: 115200
-                        }, function (data) {
-                            console.log("port updated to 115200");
-                        });
                     }
                 }
             });
         }
+    });
+    port.on('data', function (data) {
+        console.log("arduino data :", data);
+        // client.emit('value',
+        //     { "value": data, "status": status });
     });
 });
 
