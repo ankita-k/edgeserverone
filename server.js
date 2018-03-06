@@ -7,7 +7,6 @@ var axios = require('axios');
 // const Readline = SerialPort.parsers.Readline;
 
 let id;
-let count = 0;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200,
     parser: SerialPort.parsers.readline('\r\n')
@@ -77,6 +76,7 @@ io.on('connection', function (client) {
          * Send 1 from node.js to arduino for communication 
          */
         if (status == "temperature") {
+            let count = 0;
             port.update({
                 baudRate: 115200
             }, function (data) {
@@ -93,10 +93,10 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                     }
                 });
+                if (count == 5) {
+                    clearInterval(interval);
+                }
             }, 1000);
-            if (count == 5) {
-                clearInterval(interval);
-            }
         }
         /**
          * Glucometer Measurement
