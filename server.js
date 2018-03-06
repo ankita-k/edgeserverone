@@ -86,8 +86,8 @@ io.on('connection', function (client) {
                     if (buffer.toString('hex')) {
                         port.on('data', function (data) {
                             console.log("arduino data :", data);
-                            // client.emit('value',
-                            //     { "value": data.toString(), "status": status });
+                            client.emit('value',
+                                { "value": data, "status": status });
                         });
                     }
                 }
@@ -97,9 +97,9 @@ io.on('connection', function (client) {
          * Glucometer Measurement
          * Taking glucometer as input from frontend in String format
          *
-         * Send 3 from node.js to arduino for communication
+         * Send 2 from node.js to arduino for communication
          */
-        if (status == "gsr") {
+        if (status == "glucometer") {
             let buffer = new Buffer(1);
             buffer.writeInt8(2);
             port.write(buffer, function (error) {
@@ -110,8 +110,42 @@ io.on('connection', function (client) {
                     if (buffer.toString('hex')) {
                         port.on('data', function (data) {
                             console.log("arduino data :", data);
-                            // client.emit('value',
-                            //     { "value": data.toString(), "status": status });
+                            client.emit('value',
+                                { "value": data, "status": status });
+                        });
+                    }
+                }
+            });
+        }
+        /**
+         * BP Measurement
+         * Taking bp as input from frontend in String format
+         *
+         * Send 3 from node.js to arduino for communication
+         */
+        if (status == "bp") {
+            let buffer = new Buffer(1);
+            buffer.writeInt8(3);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("bp error :", error);
+                } else {
+                    console.log("bp :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        port.update({
+                            baudRate: 19200
+                        }, function (data) {
+                            console.log("port updated to 19200");
+                        });
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data);
+                            client.emit('value',
+                                { "value": data, "status": status });
+                        });
+                        port.update({
+                            baudRate: 115200
+                        }, function (data) {
+                            console.log("port updated to 115200");
                         });
                     }
                 }
