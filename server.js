@@ -4,17 +4,18 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-const Readline = SerialPort.parsers.Readline;
+// const Readline = SerialPort.parsers.Readline;
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200
+    baudRate: 115200,
+    parser: SerialPort.parsers.readline('\r\n')
 });
 
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
