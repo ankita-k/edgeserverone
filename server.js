@@ -104,7 +104,7 @@ io.on('connection', function (client) {
             });
         }
     });
-    parser.on('data', function (data) {
+    port.on('data', function (data) {
         console.log("arduino data :", data);
         // client.emit('value',
         //     { "value": data.toString(), "status": status });
