@@ -93,7 +93,7 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                     }
                 });
-                if (count == 3) {
+                if (count == 5) {
                     clearInterval(interval);
                 }
             }, 1000);
