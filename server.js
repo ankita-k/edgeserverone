@@ -93,10 +93,10 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                     }
                 });
-                if (count == 5) {
-                    clearInterval(interval);
-                }
             }, 1000);
+            if (count == 5) {
+                clearInterval(interval);
+            }
         }
         /**
          * Glucometer Measurement
