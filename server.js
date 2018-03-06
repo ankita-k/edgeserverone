@@ -129,6 +129,11 @@ io.on('connection', function (client) {
          * Send 3 from node.js to arduino for communication
          */
         if (status == "bp") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
             let buffer = new Buffer(1);
             buffer.writeInt8(3);
             port.write(buffer, function (error) {
