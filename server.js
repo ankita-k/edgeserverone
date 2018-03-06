@@ -83,6 +83,13 @@ io.on('connection', function (client) {
                     console.log("Temperature error :", error);
                 } else {
                     console.log("Temperature :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data);
+                            // client.emit('value',
+                            //     { "value": data.toString(), "status": status });
+                        });
+                    }
                 }
             });
         }
@@ -100,14 +107,16 @@ io.on('connection', function (client) {
                     console.log("glucometer error :", error);
                 } else {
                     console.log("glucometer :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        port.on('data', function (data) {
+                            console.log("arduino data :", data);
+                            // client.emit('value',
+                            //     { "value": data.toString(), "status": status });
+                        });
+                    }
                 }
             });
         }
-    });
-    port.on('data', function (data) {
-        console.log("arduino data :", data);
-        // client.emit('value',
-        //     { "value": data.toString(), "status": status });
     });
 });
 
