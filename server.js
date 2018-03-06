@@ -7,6 +7,7 @@ var axios = require('axios');
 // const Readline = SerialPort.parsers.Readline;
 
 let id;
+let count = 0;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200,
     parser: SerialPort.parsers.readline('\r\n')
@@ -81,15 +82,21 @@ io.on('connection', function (client) {
             }, function (data) {
                 console.log("port updated to 115200");
             });
-            let buffer = new Buffer(1);
-            buffer.writeInt8(1);
-            port.write(buffer, function (error) {
-                if (error) {
-                    console.log("Temperature error :", error);
-                } else {
-                    console.log("Temperature :", buffer.toString('hex'));
+            let interval = setInterval(function () {
+                count++;
+                let buffer = new Buffer(1);
+                buffer.writeInt8(1);
+                port.write(buffer, function (error) {
+                    if (error) {
+                        console.log("Temperature error :", error);
+                    } else {
+                        console.log("Temperature :", buffer.toString('hex'));
+                    }
+                });
+                if (count == 3) {
+                    clearInterval(interval);
                 }
-            });
+            }, 1000);
         }
         /**
          * Glucometer Measurement
