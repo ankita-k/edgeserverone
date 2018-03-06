@@ -26,9 +26,7 @@ let vitalStats = require('./models/vitalStats');
  * connect to mongodb
 */
 // mongoose.connect('mongodb://127.0.0.1:27017/edge');
-// mongoose.connect('mongodb://test:passwoq
-
-rd@ds211558.mlab.com: 11558 / ionic_chat');
+// mongoose.connect('mongodb://test:password@ds211558.mlab.com: 11558 / ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
