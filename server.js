@@ -24,7 +24,7 @@ let vitalStats = require('./models/vitalStats');
  * connect to mongodb
 */
 // mongoose.connect('mongodb://127.0.0.1:27017/edge');
-mongoose.connect('mongodb://test:password@ds211558.mlab.com: 11558 / ionic_chat');
+mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -137,7 +137,7 @@ io.on('connection', function (client) {
                     console.log("bp error :", error);
                 } else {
                     console.log("bp :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) { 
+                    if (buffer.toString('hex')) {
                         port.update({
                             baudRate: 19200
                         }, function (data) {
