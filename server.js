@@ -91,6 +91,7 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                     }
                 });
+                console.log(count);
                 if (count == 241) {
                     clearInterval(interval);
                 }
