@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-// const Readline = SerialPort.parsers.Readline;
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -15,7 +14,6 @@ let port = new SerialPort('/dev/ttyACM0', {
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 /**
  * Import vitalStats model
@@ -93,7 +91,7 @@ io.on('connection', function (client) {
                         console.log("Temperature :", buffer.toString('hex'));
                     }
                 });
-                if (count == 10) {
+                if (count == 5) {
                     clearInterval(interval);
                 }
             }, 1000);
@@ -149,40 +147,11 @@ io.on('connection', function (client) {
                 }
             });
         }
-        /**
-         * Spirometer Measurement
-         * Taking spirometer as input from frontend in String format
-         *
-         * Send 4 from node.js to arduino for communication
-         */
-        if (status == "spirometer") {
-            port.update({
-                baudRate: 115200
-            }, function (data) {
-                console.log("port updated to 115200");
-            });
-            let buffer = new Buffer(1);
-            buffer.writeInt8(4);
-            port.write(buffer, function (error) {
-                if (error) {
-                    console.log("spirometer error :", error);
-                } else {
-                    console.log("spirometer :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
-                        port.update({
-                            baudRate: 9600
-                        }, function (data) {
-                            console.log("port updated to 9600");
-                        });
-                    }
-                }
-            });
-        }
     });
     port.on('data', function (data) {
         console.log("arduino data :", data);
-        // client.emit('value',
-        //     { "value": data, "status": status });
+        client.emit('value',
+            { "value": data, "status": status });
     });
 });
 
