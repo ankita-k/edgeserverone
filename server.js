@@ -139,7 +139,7 @@ io.on('connection', function (client) {
                     console.log("bp error :", error);
                 } else {
                     console.log("bp :", buffer.toString('hex'));
-                    if (buffer.toString('hex')) {
+                    if (buffer.toString('hex')) { 
                         port.update({
                             baudRate: 19200
                         }, function (data) {
