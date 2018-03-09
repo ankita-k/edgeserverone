@@ -92,7 +92,7 @@ io.on('connection', function (client) {
                     }
                 });
                 console.log(count);
-                if (count == 301) {
+                if (count == 241) {
                     clearInterval(interval);
                 }
             }, 1000);
