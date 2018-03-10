@@ -92,7 +92,7 @@ io.on('connection', function (client) {
                     }
                 });
                 console.log(count);
-                if (count == 5) {
+                if (count == 241) {
                     clearInterval(interval);
                 }
             }, 1000);
@@ -222,278 +222,278 @@ app.post('/registration', function (request, response) {
                     console.log("error :", error);
                 });
         }
-    });
-});
+        0
+    }); glucoseStatusglucoseStatus
 
-/**
- *
- * Save sensor values
- * time:String
- * temperature:String
- * "gsr":{
- *  "conductance":"",
- *  "resistance":"",
- *  "conductanceVol":""
- * }
- */
-app.put('/sensorValues', function (request, response) {
-    console.log("request.body :");
-    console.log(request.body);
+    /**
+     *
+     * Save sensor values
+     * time:String
+     * temperature:String
+     * "gsr":{
+     *  "conductance":"",
+     *  "resistance":"",
+     *  "conductanceVol":""
+     * }
+     */
+    app.put('/sensorValues', function (request, response) {
+        console.log("request.body :");
+        console.log(request.body);
 
-    let details = {};
+        let details = {};
 
-    /**For measuring temperature*/
-    let temperature = request.body.temperature;
+        /**For measuring temperature*/
+        let temperature = request.body.temperature;
 
-    /**For measuring GSR*/
-    let gsr = request.body.gsr;
+        /**For measuring GSR*/
+        let gsr = request.body.gsr;
 
-    /**For measuring glucometer */
-    let glucometer = request.body.glucometer;
+        /**For measuring glucometer */
+        let glucometer = request.body.glucometer;
 
-    /**For measuring body position */
-    let bodyposition = request.body.bodyposition;
+        /**For measuring body position */
+        let bodyposition = request.body.bodyposition;
 
-    /**For measuring ECG */
-    let ecg = request.body.ecg;
+        /**For measuring ECG */
+        let ecg = request.body.ecg;
 
-    /**For measuring EMG */
-    let emg = request.body.emg;
+        /**For measuring EMG */
+        let emg = request.body.emg;
 
-    /**For measuring airflow */
-    let airflow = request.body.airflow;
+        /**For measuring airflow */
+        let airflow = request.body.airflow;
 
-    /**For measuring snore */
-    let snore = request.body.snore;
+        /**For measuring snore */
+        let snore = request.body.snore;
 
-    /**For measuring bp */
-    let bp = request.body.bp;
+        /**For measuring bp */
+        let bp = request.body.bp;
 
-    /**For measuring spirometer */
-    let spirometer = request.body.spirometer;
+        /**For measuring spirometer */
+        let spirometer = request.body.spirometer;
 
-    /**calling rest api for meme server
-     * post operation
-    */
+        /**calling rest api for meme server
+         * post operation
+        */
 
-    //header
-    let axiosConfig = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
+        //header
+        let axiosConfig = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
 
-    vitalStats.findOne({ _id: request.body._id }, function (error, res) {
-        if (error) {
-            details.error = true;
-            details.message = `User not found.`;
-            response.status(404).json(details);
-        } else if (res) {
-            /**temperature
-             * post data to local database
-             * post data to meme server
-             */
-            if (temperature) {
-                //post temperature data to local database
-                res.stats.push({
-                    "temperature": temperature
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
+        vitalStats.findOne({ _id: request.body._id }, function (error, res) {
+            if (error) {
+                details.error = true;
+                details.message = `User not found.`;
+                response.status(404).json(details);
+            } else if (res) {
+                /**temperature
+                 * post data to local database
+                 * post data to meme server
+                 */
+                if (temperature) {
+                    //post temperature data to local database
+                    res.stats.push({
                         "temperature": temperature
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
                     });
-            }
 
-            if (gsr) {
-                res.stats.push({
-                    "gsr": gsr
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "gsr": gsr
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (glucometer) {
-                res.stats.push({
-                    "glucometer": glucometer
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "glucometer": glucometer
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (bodyposition) {
-                res.stats.push({
-                    "bodyposition": bodyposition
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "bodyposition": bodyposition
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (ecg) {
-                res.stats.push({
-                    "ecg": ecg
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "ecg": ecg
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (emg) {
-                res.stats.push({
-                    "emg": emg
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "emg": emg
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (bp) {
-                res.stats.push({
-                    "bp": bp
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "bp": bp
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-
-            if (airflow) {
-                res.stats.push({
-                    "airflow": airflow
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "airflow": airflow
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-
-            if (snore) {
-                res.stats.push({
-                    "snore": snore
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "snore": snore
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (spirometer) {
-                res.stats.push({
-                    "spirometer": spirometer
-                });
-
-                //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "spirometer": spirometer
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            res.save(function (error, result) {
-                if (error) {
-                    details.error = true;
-                    details.message = `Sensor details not saved.`;
-                    response.status(404).json(details);
-                } else if (result) {
-                    details.error = false;
-                    details.sensorDetails = result;
-                    details.message = `Sensor Details.`;
-                    response.status(200).json(details);
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "temperature": temperature
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
                 }
-            });
-        }
-    });
-});
 
-const PORT = 7000;
-server.listen(PORT, function () {
-    console.log("Server started");
-});
+                if (gsr) {
+                    res.stats.push({
+                        "gsr": gsr
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "gsr": gsr
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (glucometer) {
+                    res.stats.push({
+                        "glucometer": glucometer
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "glucometer": glucometer
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (bodyposition) {
+                    res.stats.push({
+                        "bodyposition": bodyposition
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "bodyposition": bodyposition
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (ecg) {
+                    res.stats.push({
+                        "ecg": ecg
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "ecg": ecg
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (emg) {
+                    res.stats.push({
+                        "emg": emg
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "emg": emg
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (bp) {
+                    res.stats.push({
+                        "bp": bp
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "bp": bp
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+
+                if (airflow) {
+                    res.stats.push({
+                        "airflow": airflow
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "airflow": airflow
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+
+                if (snore) {
+                    res.stats.push({
+                        "snore": snore
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "snore": snore
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                if (spirometer) {
+                    res.stats.push({
+                        "spirometer": spirometer
+                    });
+
+                    //update data to memeserver
+                    axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                        "_id": id,
+                        "stats": {
+                            "spirometer": spirometer
+                        }
+                    }, axiosConfig)
+                        .then(function (result) {
+                            console.log("result :", result.data);
+                        }).catch(function (error) {
+                            console.log("error :", error);
+                        });
+                }
+                res.save(function (error, result) {
+                    if (error) {
+                        details.error = true;
+                        details.message = `Sensor details not saved.`;
+                        response.status(404).json(details);
+                    } else if (result) {
+                        details.error = false;
+                        details.sensorDetails = result;
+                        details.message = `Sensor Details.`;
+                        response.status(200).json(details);
+                    }
+                });
+            }
+        });
+    });
+
+    const PORT = 7000;
+    server.listen(PORT, function () {
+        console.log("Server started");
+    });
