@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
+var config = require ('./config.json');
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -205,7 +206,7 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
 
-            axios.post('https://memeapi.memeinfotech.com/vital/create', {
+            axios.post(config.apiUrl+'vital/create', {
                 "name": name,
                 "email": email,
                 "individualId": individualId,
@@ -300,7 +301,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "temperature": temperature
@@ -319,7 +320,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "gsr": gsr
@@ -337,7 +338,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "glucometer": glucometer
@@ -355,7 +356,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "bodyposition": bodyposition
@@ -373,7 +374,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "ecg": ecg
@@ -391,7 +392,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "emg": emg
@@ -409,7 +410,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "bp": bp
@@ -428,7 +429,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "airflow": airflow
@@ -447,7 +448,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "snore": snore
@@ -465,7 +466,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put('https://memeapi.memeinfotech.com/vital/update', {
+                axios.put(config.apiUrl+'vital/update', {
                     "_id": id,
                     "stats": {
                         "spirometer": spirometer
