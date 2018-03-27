@@ -29,7 +29,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/edge');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
-    console.log('Connected to mongodb!!');
+    console.log('Connected to mongodb!!!');
 });
 
 //on error
