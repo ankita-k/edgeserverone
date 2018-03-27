@@ -249,7 +249,6 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
 
-            /*
             axios.post(config.apiUrl + 'vital/create', {
                 "name": name,
                 "email": email,
@@ -266,7 +265,7 @@ app.post('/registration', function (request, response) {
                 }).catch(function (error) {
                     console.log("error :", error);
                 });
-                */
+
         }
     });
 });
