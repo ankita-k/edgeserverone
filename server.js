@@ -24,8 +24,8 @@ let vitalStats = require('./models/vitalStats');
 /**
  * connect to mongodb
 */
-mongoose.connect('mongodb://127.0.0.1:27017/edge');
-// mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
+// mongoose.connect('mongodb://127.0.0.1:27017/edge');
+mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -457,7 +457,7 @@ app.put('/sensorValues', function (request, response) {
     });
 });
 
-const PORT = 7000;
+const PORT = 8000;
 server.listen(PORT, function () {
     console.log("Server started");
 });
