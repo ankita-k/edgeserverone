@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-var config = require ('./config.json');
+var config = require('./config.json');
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -24,8 +24,8 @@ let vitalStats = require('./models/vitalStats');
 /**
  * connect to mongodb
 */
-// mongoose.connect('mongodb://127.0.0.1:27017/edge');
-mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
+mongoose.connect('mongodb://127.0.0.1:27017/edge');
+// mongoose.connect('mongodb://test:password@ds211558.mlab.com:11558/ionic_chat');
 
 //on successful connection
 mongoose.connection.on('connected', () => {
@@ -44,24 +44,6 @@ app.use(cors());
 //body-parser
 app.use(bodyParser.json());
 
-/**Update baudrate for blood presure  */
-function updatePortBP() {
-    port.update({
-        baudRate: 19200
-    }, function (data) {
-        console.log("port updated to 19200");
-    });
-}
-
-/**Update baudrate for normal presure  */
-function updatePortNormal() {
-    port.update({
-        baudRate: 115200
-    }, function (data) {
-        console.log("port updated to 115200");
-    });
-}
-
 io.on('connection', function (client) {
     console.log("Socket connected !");
     let status;
@@ -69,10 +51,8 @@ io.on('connection', function (client) {
         status = data.status;
         console.log("status :", status);
         /**
-         * Body Temparature Measurement
-         * Taking temperature as input from frontend in String format
-         *
-         * Send 1 from node.js to arduino for communication 
+         * input : "temperature", from web
+         * send : 6 , to arduino
          */
         if (status == "temperature") {
             let count = 0;
@@ -84,7 +64,7 @@ io.on('connection', function (client) {
             let interval = setInterval(function () {
                 count++;
                 let buffer = new Buffer(1);
-                buffer.writeInt8(1);
+                buffer.writeInt8(6);
                 port.write(buffer, function (error) {
                     if (error) {
                         console.log("Temperature error :", error);
@@ -99,10 +79,8 @@ io.on('connection', function (client) {
             }, 1000);
         }
         /**
-         * Glucometer Measurement
-         * Taking glucometer as input from frontend in String format
-         *
-         * Send 2 from node.js to arduino for communication
+         * input : "glucometer", from web
+         * send : 2 , to arduino
          */
         if (status == "glucometer") {
             port.update({
@@ -121,10 +99,8 @@ io.on('connection', function (client) {
             });
         }
         /**
-         * BP Measurement
-         * Taking bp as input from frontend in String format
-         *
-         * Send 3 from node.js to arduino for communication
+         * input : "bp", from web
+         * send : 3 , to arduino
          */
         if (status == "bp") {
             port.update({
@@ -144,6 +120,73 @@ io.on('connection', function (client) {
                             baudRate: 19200
                         }, function (data) {
                             console.log("port updated to 19200");
+                        });
+                    }
+                }
+            });
+        }
+        /**
+         * input : "spo2", from web
+         * send : 4 , to arduino
+         */
+        if (status == "spo2") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(4);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("spo2 error :", error);
+                } else {
+                    console.log("spo2 :", buffer.toString('hex'));
+                }
+            });
+        }
+        /**
+         * input : "gsr", from web
+         * send : 5 , to arduino
+         */
+        if (status == "gsr") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(5);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("gsr error :", error);
+                } else {
+                    console.log("gsr :", buffer.toString('hex'));
+                }
+            });
+        }
+        /**
+         * input : "spirometer", from web
+         * send : 7 , to arduino
+         */
+        if (status == "spirometer") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(7);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("gsr error :", error);
+                } else {
+                    console.log("gsr :", buffer.toString('hex'));
+                    if (buffer.toString('hex')) {
+                        port.update({
+                            baudRate: 9600
+                        }, function (data) {
+                            console.log("port updated to 9600");
                         });
                     }
                 }
@@ -206,7 +249,8 @@ app.post('/registration', function (request, response) {
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
 
-            axios.post(config.apiUrl+'vital/create', {
+            /*
+            axios.post(config.apiUrl + 'vital/create', {
                 "name": name,
                 "email": email,
                 "individualId": individualId,
@@ -222,6 +266,7 @@ app.post('/registration', function (request, response) {
                 }).catch(function (error) {
                     console.log("error :", error);
                 });
+                */
         }
     });
 });
@@ -246,31 +291,19 @@ app.put('/sensorValues', function (request, response) {
     /**For measuring temperature*/
     let temperature = request.body.temperature;
 
-    /**For measuring GSR*/
-    let gsr = request.body.gsr;
-
     /**For measuring glucometer */
     let glucometer = request.body.glucometer;
-
-    /**For measuring body position */
-    let bodyposition = request.body.bodyposition;
-
-    /**For measuring ECG */
-    let ecg = request.body.ecg;
-
-    /**For measuring EMG */
-    let emg = request.body.emg;
-
-    /**For measuring airflow */
-    let airflow = request.body.airflow;
-
-    /**For measuring snore */
-    let snore = request.body.snore;
 
     /**For measuring bp */
     let bp = request.body.bp;
 
-    /**For measuring spirometer */
+    /**For measuring ECG */
+    let spo2 = request.body.spo2;
+
+    /**For measuring GSR*/
+    let gsr = request.body.gsr;
+
+    /**For measuring spirometer*/
     let spirometer = request.body.spirometer;
 
     /**calling rest api for meme server
@@ -301,10 +334,67 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
+                axios.put(config.apiUrl + 'vital/update', {
                     "_id": id,
                     "stats": {
                         "temperature": temperature
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (glucometer) {
+                res.stats.push({
+                    "glucometer": glucometer
+                });
+
+                //update data to memeserver
+                axios.put(config.apiUrl + 'vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "glucometer": glucometer
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (bp) {
+                res.stats.push({
+                    "bp": bp
+                });
+
+                //update data to memeserver
+                axios.put(config.apiUrl + 'vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "bp": bp
+                    }
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (spo2) {
+                res.stats.push({
+                    "spo2": spo2
+                });
+
+                //update data to memeserver
+                axios.put(config.apiUrl + 'vital/update', {
+                    "_id": id,
+                    "stats": {
+                        "spo2": spo2
                     }
                 }, axiosConfig)
                     .then(function (result) {
@@ -320,7 +410,7 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
+                axios.put(config.apiUrl + 'vital/update', {
                     "_id": id,
                     "stats": {
                         "gsr": gsr
@@ -332,141 +422,14 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
-            if (glucometer) {
-                res.stats.push({
-                    "glucometer": glucometer
-                });
 
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "glucometer": glucometer
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (bodyposition) {
-                res.stats.push({
-                    "bodyposition": bodyposition
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "bodyposition": bodyposition
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (ecg) {
-                res.stats.push({
-                    "ecg": ecg
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "ecg": ecg
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (emg) {
-                res.stats.push({
-                    "emg": emg
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "emg": emg
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-            if (bp) {
-                res.stats.push({
-                    "bp": bp
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "bp": bp
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-
-            if (airflow) {
-                res.stats.push({
-                    "airflow": airflow
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "airflow": airflow
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
-
-            if (snore) {
-                res.stats.push({
-                    "snore": snore
-                });
-
-                //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "snore": snore
-                    }
-                }, axiosConfig)
-                    .then(function (result) {
-                        console.log("result :", result.data);
-                    }).catch(function (error) {
-                        console.log("error :", error);
-                    });
-            }
             if (spirometer) {
                 res.stats.push({
                     "spirometer": spirometer
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl+'vital/update', {
+                axios.put(config.apiUrl + 'vital/update', {
                     "_id": id,
                     "stats": {
                         "spirometer": spirometer
