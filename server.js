@@ -7,7 +7,7 @@ var axios = require('axios');
 var config = require('./config.json');
 
 let id;
-let port = new SerialPort('/dev/ttyACM0', {
+let port = new SerialPort('/dev/ttyACM1', {
     baudRate: 115200,
     parser: SerialPort.parsers.readline('\r\n')
 });
