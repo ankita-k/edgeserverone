@@ -194,7 +194,7 @@ io.on('connection', function (client) {
         }
     });
     port.on('data', function (data) {
-        console.log("arduino data :", toString(data));
+        console.log("arduino data :", data);
         client.emit('value',
             { "value": data, "status": status });
     });
