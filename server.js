@@ -1,5 +1,7 @@
 var express = require('express');
-const SerialPort = require('serialport-v4');
+// const SerialPort = require('serialport-v4');
+const SerialPort = require('serialport-v5');
+// const Readline = serialport-v5.parsers.Readline;
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -8,9 +10,10 @@ var config = require('./config.json');
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
-    baudRate: 115200,
-    parser: SerialPort.parsers.readline('\r\n')
+    baudRate: 115200
 });
+
+// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 var app = express();
 var server = require('http').Server(app);
@@ -156,7 +159,7 @@ io.on('connection', function (client) {
                 console.log("port updated to 115200");
             });
             let buffer = new Buffer(1);
-            buffer.writeInt8(5);
+            buffer.writeInt8(9);
             port.write(buffer, function (error) {
                 if (error) {
                     console.log("gsr error :", error);
@@ -194,9 +197,9 @@ io.on('connection', function (client) {
         }
     });
     port.on('data', function (data) {
-        console.log("arduino data :", data);
+        console.log("arduino data :", data.toString());
         client.emit('value',
-            { "value": data, "status": status });
+            { "value": data.toString(), "status": status });
     });
 });
 
