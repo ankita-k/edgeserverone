@@ -1,7 +1,5 @@
 var express = require('express');
-// const SerialPort = require('serialport-v4');
 const SerialPort = require('serialport-v5');
-// const Readline = serialport-v5.parsers.Readline;
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -225,17 +223,6 @@ app.post('/registration', function (request, response) {
     let email = request.body.email;
     let individualId = request.body.individualId;
 
-    /**calling rest api for meme server
-     * post operation
-    */
-
-    //header
-    let axiosConfig = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
-
     let data = new vitalStats();
     data.name = name;
     data.email = email;
@@ -249,26 +236,11 @@ app.post('/registration', function (request, response) {
         } else if (result) {
             userDetails.error = false;
             userDetails.userRegistration = result;
+            console.log("res result :", result);
+            id = result.individualId;
+            console.log("id :", id);
             userDetails.message = `User Registration Details.`;
             response.status(200).json(userDetails);
-
-            axios.post(config.apiUrl + 'vital/create', {
-                "name": name,
-                "email": email,
-                "individualId": individualId,
-                "createdBy": individualId,
-                "updatedBy": individualId
-            }, axiosConfig)
-                .then(function (result) {
-                    console.log("result :", result.data);
-
-                    //after post data to memeserver id is
-                    id = result.data.result._id;
-                    console.log("id :", id);
-                }).catch(function (error) {
-                    console.log("error :", error);
-                });
-
         }
     });
 });
@@ -336,11 +308,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "temperature": temperature
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "temperature",
+                    "statValue": temperature
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
@@ -355,11 +326,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "glucometer": glucometer
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "glucometer",
+                    "statValue": glucometer
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
@@ -374,11 +344,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "bp": bp
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "bp",
+                    "statValue": bp
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
@@ -451,6 +420,7 @@ app.put('/sensorValues', function (request, response) {
                 } else if (result) {
                     details.error = false;
                     details.sensorDetails = result;
+                    console.log(result);
                     details.message = `Sensor Details.`;
                     response.status(200).json(details);
                 }
