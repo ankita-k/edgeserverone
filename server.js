@@ -1,5 +1,6 @@
 var express = require('express');
 const SerialPort = require('serialport-v5');
+const Readline = SerialPort.parsers.Readline;
 var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -10,6 +11,7 @@ let id;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
+const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 // const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
@@ -180,9 +182,9 @@ io.on('connection', function (client) {
             buffer.writeInt8(7);
             port.write(buffer, function (error) {
                 if (error) {
-                    console.log("gsr error :", error);
+                    console.log("spirometer error :", error);
                 } else {
-                    console.log("gsr :", buffer.toString('hex'));
+                    console.log("spirometer :", buffer.toString('hex'));
                     if (buffer.toString('hex')) {
                         port.update({
                             baudRate: 9600
@@ -194,10 +196,10 @@ io.on('connection', function (client) {
             });
         }
     });
-    port.on('data', function (data) {
-        console.log("arduino data :", data.toString());
+    parser.on('data', function (data) {
+        console.log("arduino data :", data);
         client.emit('value',
-            { "value": data.toString(), "status": status });
+            { "value": data, "status": status });
     });
 });
 
@@ -400,11 +402,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "spirometer": spirometer
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "spirometer",
+                    "statValue": spirometer
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
