@@ -5,15 +5,17 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var axios = require('axios');
+var net = require('net');
 var config = require('./config.json');
+
+var body_Scale_Port = 9000;
+var host = '192.168.1.121';
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 });
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-
-// const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 var app = express();
 var server = require('http').Server(app);
@@ -76,7 +78,7 @@ io.on('connection', function (client) {
                     }
                 });
                 console.log(count);
-                if (count == 241) {
+                if (count == 31) {
                     clearInterval(interval);
                 }
             }, 1000);
