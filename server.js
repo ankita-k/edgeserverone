@@ -9,7 +9,7 @@ var net = require('net');
 var config = require('./config.json');
 
 var body_Scale_Port = 9000;
-var host = '192.168.1.121';
+var host = 'brij.local';
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
@@ -195,6 +195,36 @@ io.on('connection', function (client) {
                         });
                     }
                 }
+            });
+        }
+        /**body-scale */
+        if (status == "bodyscale") {
+            var cli = new net.Socket();
+            cli.connect(body_Scale_Port, host, function () {
+                console.log('CONNECTED TO: ' + host + ':' + body_Scale_Port);
+                // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
+                cli.write('http://host:9000/LED=ON');
+            });
+            // Add a 'data' event handler for the client socket
+            // data is what the server sent to this socket
+            cli.on('data', function (data) {
+                console.log('data: ' + data);
+                if (data) {
+                    client.emit('bodyscale_value', {
+                        value: data.toString(), "status": status
+                    });
+                }
+                cli.write('http://host:9000/LED=OFF');
+                // Close the client socket completely
+                cli.destroy();
+            });
+
+            // Add a 'close' event handler for the client socket
+            cli.on('close', function () {
+                console.log('Connection closed');
+            });
+            cli.on('error', function (error) {
+                console.log(error);
             });
         }
     });
