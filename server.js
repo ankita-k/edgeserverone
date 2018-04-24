@@ -9,7 +9,7 @@ var net = require('net');
 var config = require('./config.json');
 
 var body_Scale_Port = 9000;
-var host = 'brij.local';
+var host = 'hwsensor.local';
 
 let id;
 let port = new SerialPort('/dev/ttyACM0', {
