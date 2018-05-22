@@ -462,7 +462,7 @@ app.put('/sensorValues', function (request, response) {
     });
 });
 
-const PORT = 8000;
+const PORT = 7000;
 server.listen(PORT, function () {
     console.log("Server started");
 });
