@@ -15,7 +15,7 @@
     "express": "^4.16.2",
     "mongoose": "^5.0.4",
     "net": "^1.0.2",
-    "nodemon": "^1.14.12",
+    "nodemon": "^1.17.5",
     "serialport": "^6.1.1",
     "serialport-v4": "^4.0.9",
     "serialport-v5": "^5.0.0",

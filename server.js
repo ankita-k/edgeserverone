@@ -197,6 +197,31 @@ io.on('connection', function (client) {
                 }
             });
         }
+
+        if (status == "ecg") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(8);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("ecg detail :", error);
+                } else {
+                    console.log("ecg :", buffer.toString('hex'));
+                    // if (buffer.toString('hex')) {
+                    //     port.update({
+                    //         baudRate: 9600
+                    //     }, function (data) {
+                    //         console.log("port updated to 9600");
+                    //     });
+                    // }
+                }
+            });
+        }
+
         /**body-scale */
         if (status == "bodyscale") {
             var cli = new net.Socket();
@@ -313,6 +338,8 @@ app.put('/sensorValues', function (request, response) {
 
     /**For measuring spirometer*/
     let spirometer = request.body.spirometer;
+    let ecg = request.body.ecg;
+    let bodyposition = request.body.bodyposition;
 
     /**calling rest api for meme server
      * post operation
@@ -335,6 +362,47 @@ app.put('/sensorValues', function (request, response) {
              * post data to local database
              * post data to meme server
              */
+            if (ecg) {
+                console.log(ecg);
+                //post ecg data to local database
+                res.stats.push({
+                    "ecg": ecg
+                });
+
+                //update data to memeserver
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "ecg",
+                    "statValue": ecg
+
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result ecg :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (bodyposition) {
+                //post bodyposition data to local database
+                res.stats.push({
+                    "bodyposition": bodyposition
+                });
+
+                //update data to memeserver
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "bodyposition",
+                    "statValue": bodyposition
+
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result body :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
             if (temperature) {
                 //post temperature data to local database
                 res.stats.push({
@@ -353,8 +421,9 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
-
             if (glucometer) {
+                console.log("glucometer data to be posted");
+                console.log(glucometer);
                 res.stats.push({
                     "glucometer": glucometer
                 });
@@ -396,11 +465,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "spo2": spo2
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "spo2",
+                    "statValue": spo2
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
@@ -408,6 +476,43 @@ app.put('/sensorValues', function (request, response) {
                         console.log("error :", error);
                     });
             }
+            // if (spo2) {
+            //     res.stats.push({
+            //         "spo2": spo2
+            //     });
+
+            //     //update data to memeserver
+            //     axios.put(config.apiUrl + 'vital/update', {
+            //         "_id": id,
+            //         "stats": {
+            //             "spo2": spo2
+            //         }
+            //     }, axiosConfig)
+            //         .then(function (result) {
+            //             console.log("result :", result.data);
+            //         }).catch(function (error) {
+            //             console.log("error :", error);
+            //         });
+            // }
+
+            // if (gsr) {
+            //     res.stats.push({
+            //         "gsr": gsr
+            //     });
+
+            //     //update data to memeserver
+            //     axios.put(config.apiUrl + 'vital/update', {
+            //         "_id": id,
+            //         "stats": {
+            //             "gsr": gsr
+            //         }
+            //     }, axiosConfig)
+            //         .then(function (result) {
+            //             console.log("result :", result.data);
+            //         }).catch(function (error) {
+            //             console.log("error :", error);
+            //         });
+            // }
 
             if (gsr) {
                 res.stats.push({
@@ -415,11 +520,10 @@ app.put('/sensorValues', function (request, response) {
                 });
 
                 //update data to memeserver
-                axios.put(config.apiUrl + 'vital/update', {
-                    "_id": id,
-                    "stats": {
-                        "gsr": gsr
-                    }
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "gsr",
+                    "statValue": gsr
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result :", result.data);
@@ -462,7 +566,7 @@ app.put('/sensorValues', function (request, response) {
     });
 });
 
-const PORT = 7000;
+const PORT = 8000;
 server.listen(PORT, function () {
-    console.log("Server started");
+    console.log("Server started at:  ", PORT);
 });
