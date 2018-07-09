@@ -55,34 +55,9 @@ io.on('connection', function (client) {
     client.on("start", function (data) {
         status = data.status;
         console.log("status :", status);
-        /**
-         * input : "temperature", from web
-         * send : 6 , to arduino
-         */
-        if (status == "temperature") {
-            let count = 0;
-            port.update({
-                baudRate: 115200
-            }, function (data) {
-                console.log("port updated to 115200");
-            });
-            let interval = setInterval(function () {
-                count++;
-                let buffer = new Buffer(1);
-                buffer.writeInt8(6);
-                port.write(buffer, function (error) {
-                    if (error) {
-                        console.log("Temperature error :", error);
-                    } else {
-                        console.log("Temperature :", buffer.toString('hex'));
-                    }
-                });
-                console.log(count);
-                if (count == 31) {
-                    clearInterval(interval);
-                }
-            }, 1000);
-        }
+  
+
+
         /**
          * input : "glucometer", from web
          * send : 2 , to arduino
@@ -151,25 +126,54 @@ io.on('connection', function (client) {
             });
         }
         /**
-         * input : "gsr", from web
-         * send : 5 , to arduino
-         */
-        if (status == "gsr") {
+                * input : "gsr", from web
+                * send : 5 , to arduino
+                */
+        if (status == "airflow") {
             port.update({
                 baudRate: 115200
             }, function (data) {
                 console.log("port updated to 115200");
             });
             let buffer = new Buffer(1);
-            buffer.writeInt8(9);
+            buffer.writeInt8(5);
             port.write(buffer, function (error) {
                 if (error) {
-                    console.log("gsr error :", error);
+                    console.log("airflow error :", error);
                 } else {
-                    console.log("gsr :", buffer.toString('hex'));
+                    console.log("airflow :", buffer.toString('hex'));
                 }
             });
         }
+      /**
+         * input : "temperature", from web
+         * send : 6 , to arduino
+         */
+        if (status == "temperature") {
+            let count = 0;
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let interval = setInterval(function () {
+                count++;
+                let buffer = new Buffer(1);
+                buffer.writeInt8(6);
+                port.write(buffer, function (error) {
+                    if (error) {
+                        console.log("Temperature error :", error);
+                    } else {
+                        console.log("Temperature :", buffer.toString('hex'));
+                    }
+                });
+                console.log(count);
+                if (count == 31) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
         /**
          * input : "spirometer", from web
          * send : 7 , to arduino
@@ -221,6 +225,67 @@ io.on('connection', function (client) {
                 }
             });
         }
+
+                /**
+         * input : "gsr", from web
+         * send : 5 , to arduino
+         */
+        if (status == "gsr") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(9);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("gsr error :", error);
+                } else {
+                    console.log("gsr :", buffer.toString('hex'));
+                }
+            });
+        }
+
+                    /**
+         * input : "emg", from web
+         * send : 2 , to arduino
+         */
+        if (status == "emg") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(10);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("emg error :", error);
+                } else {
+                    console.log("emg :", buffer.toString('hex'));
+                }
+            });
+        }
+
+
+        if (status == "snore") {
+            port.update({
+                baudRate: 115200
+            }, function (data) {
+                console.log("port updated to 115200");
+            });
+            let buffer = new Buffer(1);
+            buffer.writeInt8(11);
+            port.write(buffer, function (error) {
+                if (error) {
+                    console.log("snore error :", error);
+                } else {
+                    console.log("snore :", buffer.toString('hex'));
+                }
+            });
+        }
+
 
         /**body-scale */
         if (status == "bodyscale") {
@@ -340,6 +405,11 @@ app.put('/sensorValues', function (request, response) {
     let spirometer = request.body.spirometer;
     let ecg = request.body.ecg;
     let bodyposition = request.body.bodyposition;
+    let airflow = request.body.airflow;
+    let emg = request.body.emg;
+    let snore = request.body.snore;
+    
+
 
     /**calling rest api for meme server
      * post operation
@@ -362,8 +432,51 @@ app.put('/sensorValues', function (request, response) {
              * post data to local database
              * post data to meme server
              */
+
+
+
+
+            if (emg) {
+                //post emg data to local database
+                res.stats.push({
+                    "emg": emg
+                });
+
+                //update data to memeserver
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "emg",
+                    "statValue": emg
+
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result emg :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (snore) {
+                //post snore data to local database
+                res.stats.push({
+                    "snore": snore
+                });
+
+                //update data to memeserver
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "snore",
+                    "statValue": snore
+
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result snore :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
             if (ecg) {
-                console.log(ecg);
                 //post ecg data to local database
                 res.stats.push({
                     "ecg": ecg
@@ -378,6 +491,26 @@ app.put('/sensorValues', function (request, response) {
                 }, axiosConfig)
                     .then(function (result) {
                         console.log("result ecg :", result.data);
+                    }).catch(function (error) {
+                        console.log("error :", error);
+                    });
+            }
+
+            if (airflow) {
+                //post airflow data to local database
+                res.stats.push({
+                    "airflow": airflow
+                });
+
+                //update data to memeserver
+                axios.post(config.apiUrl + 'vital/create', {
+                    "individualId": id,
+                    "statType": "airflow",
+                    "statValue": airflow
+
+                }, axiosConfig)
+                    .then(function (result) {
+                        console.log("result airflow :", result.data);
                     }).catch(function (error) {
                         console.log("error :", error);
                     });
